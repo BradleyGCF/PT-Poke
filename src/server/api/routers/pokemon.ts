@@ -2,11 +2,12 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { 
   PokemonSchema, 
-  PokemonListResponseSchema, 
+  PokemonListResponseSchema,
   PokemonSpeciesSchema,
   PokemonListItemWithDetailsSchema,
   type PokemonListItemWithDetails 
 } from "~/types/pokemon";
+import { logger } from "~/utils";
 
 const POKEAPI_BASE_URL = "https://pokeapi.co/api/v2";
 
@@ -30,6 +31,72 @@ function getGenerationDisplayName(generationName: string): string {
     'generation-ix': 'Generation IX (Paldea)',
   };
   return generationMap[generationName] ?? generationName;
+}
+
+// Helper function to get evolution chain for a Pokemon
+async function getEvolutionChain(speciesUrl: string): Promise<string[]> {
+  try {
+    const speciesResponse = await fetch(speciesUrl);
+    if (!speciesResponse.ok) return [];
+    
+    const speciesData = await speciesResponse.json() as { evolution_chain?: { url: string } };
+    const evolutionChainUrl = speciesData.evolution_chain?.url;
+    
+    if (!evolutionChainUrl) return [];
+    
+    const evolutionResponse = await fetch(evolutionChainUrl);
+    if (!evolutionResponse.ok) return [];
+    
+    const evolutionData = await evolutionResponse.json() as {
+      chain: EvolutionChainNode;
+    };
+    
+    // Extract all Pokemon names from the evolution chain
+    const pokemonNames: string[] = [];
+    
+    function extractEvolutions(evolution: EvolutionChainNode): void {
+      if (evolution?.species?.name) {
+        pokemonNames.push(evolution.species.name);
+      }
+      
+      if (evolution?.evolves_to) {
+        evolution.evolves_to.forEach((evo) => extractEvolutions(evo));
+      }
+    }
+    
+    extractEvolutions(evolutionData.chain);
+    return pokemonNames;
+  } catch (error) {
+    logger.error('Error fetching evolution chain', { error, speciesUrl });
+    return [];
+  }
+}
+
+// Type for evolution chain structure
+interface EvolutionChainNode {
+  species: { name: string };
+  evolves_to: EvolutionChainNode[];
+}
+
+// Helper function to normalize search terms
+function normalizeSearchTerm(term: string): string {
+  return term.toLowerCase().trim();
+}
+
+// Type for basic Pokemon details response
+interface BasicPokemonDetails {
+  species: { url: string };
+  [key: string]: unknown;
+}
+
+// Helper function to fetch Pokemon details
+async function fetchPokemonDetails(nameOrUrl: string): Promise<BasicPokemonDetails> {
+  const url = nameOrUrl.startsWith('http') ? nameOrUrl : `${POKEAPI_BASE_URL}/pokemon/${nameOrUrl}`;
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch Pokemon details for ${nameOrUrl}`);
+  }
+  return response.json() as Promise<BasicPokemonDetails>;
 }
 
 export const pokemonRouter = createTRPCRouter({
@@ -60,15 +127,18 @@ export const pokemonRouter = createTRPCRouter({
         offset: z.number().min(0).default(0),
         typeFilter: z.string().optional(),
         generationFilter: z.string().optional(),
+        nameSearch: z.string().optional(),
       })
     )
     .query(async ({ input }) => {
       try {
-        // For filtered requests, we need to fetch more data upfront to have enough results
-        // But we'll use a reasonable batch size instead of 1000
-        const isFiltered = input.typeFilter || input.generationFilter;
-        const batchSize = isFiltered ? Math.min(200, input.limit * 10) : input.limit;
-        const fetchOffset = isFiltered ? 0 : input.offset;
+        // For name search, we need to fetch more Pokemon to find evolution families
+        // But we'll use a reasonable limit to avoid long loading times
+        const isNameSearch = !!input.nameSearch;
+        const isOtherFiltered = (input.typeFilter && input.typeFilter.trim() !== '') || 
+                                (input.generationFilter && input.generationFilter.trim() !== '');
+        const batchSize = isNameSearch ? 1000 : (isOtherFiltered ? 1000 : input.limit);
+        const fetchOffset = (isNameSearch || isOtherFiltered) ? 0 : input.offset;
         
         // First get the basic list
         const response = await fetch(
@@ -84,7 +154,7 @@ export const pokemonRouter = createTRPCRouter({
         
         // Fetch detailed information for each Pokemon in smaller batches
         const detailedPokemon: PokemonListItemWithDetails[] = [];
-        const batchProcessSize = 20; // Process 20 Pokemon at a time to avoid overwhelming the API
+        const batchProcessSize = 20;
         
         for (let i = 0; i < pokemonList.results.length; i += batchProcessSize) {
           const batch = pokemonList.results.slice(i, i + batchProcessSize);
@@ -93,9 +163,7 @@ export const pokemonRouter = createTRPCRouter({
             batch.map(async (pokemon) => {
             try {
               // Get Pokemon details
-              const pokemonResponse = await fetch(pokemon.url);
-              if (!pokemonResponse.ok) throw new Error(`Failed to fetch ${pokemon.name}`);
-              const pokemonData = await pokemonResponse.json();
+              const pokemonData = await fetchPokemonDetails(pokemon.url);
               const parsedPokemon = PokemonSchema.parse(pokemonData);
               
               // Get species information for generation
@@ -113,7 +181,10 @@ export const pokemonRouter = createTRPCRouter({
                         parsedPokemon.sprites.front_default,
               });
             } catch (error) {
-              console.error(`Error fetching details for ${pokemon.name}:`, error);
+              logger.error(`Error fetching details for Pokémon`, { 
+                pokemonName: pokemon.name, 
+                error 
+              });
               // Return basic info if detailed fetch fails
               const id = extractIdFromUrl(pokemon.url);
               return PokemonListItemWithDetailsSchema.parse({
@@ -125,7 +196,7 @@ export const pokemonRouter = createTRPCRouter({
               });
             }
           })
-        );
+        )
           
           detailedPokemon.push(...batchResults);
         }
@@ -136,19 +207,62 @@ export const pokemonRouter = createTRPCRouter({
         // Apply filters if specified
         let filteredPokemon = detailedPokemon;
         
-        if (input.typeFilter) {
+        if (input.typeFilter && input.typeFilter.trim() !== '') {
           filteredPokemon = filteredPokemon.filter(pokemon => 
             pokemon.types.some(type => type.toLowerCase() === input.typeFilter!.toLowerCase())
           );
         }
         
-        if (input.generationFilter) {
+        if (input.generationFilter && input.generationFilter.trim() !== '') {
+          const beforeCount = filteredPokemon.length;
           filteredPokemon = filteredPokemon.filter(pokemon => 
             pokemon.generation === input.generationFilter
           );
+          logger.debug('Generation filter applied', { 
+            generation: input.generationFilter, 
+            beforeCount, 
+            afterCount: filteredPokemon.length 
+          });
+        }
+        
+        // Apply name search with evolution support
+        if (input.nameSearch) {
+          const searchResults = [];
+          const normalizedSearch = normalizeSearchTerm(input.nameSearch);
+          const evolutionFamilies = new Set<string>();
+          
+          // First, find direct matches and get their evolution families
+          for (const pokemon of filteredPokemon) {
+            if (normalizeSearchTerm(pokemon.name).includes(normalizedSearch)) {
+              searchResults.push(pokemon);
+              
+              // Also get this Pokemon's evolution family to include relatives
+              try {
+                const pokemonDetails = await fetchPokemonDetails(pokemon.name);
+                const evolutionNames = await getEvolutionChain(pokemonDetails.species.url);
+                evolutionNames.forEach(name => evolutionFamilies.add(name));
+              } catch (error) {
+                logger.error('Error getting evolution family', { 
+                  pokemonName: pokemon.name, 
+                  error 
+                });
+              }
+            }
+          }
+          
+          // Now add any Pokemon from those evolution families that aren't already included
+          for (const pokemon of filteredPokemon) {
+            if (!searchResults.some(p => p.name === pokemon.name) && 
+                evolutionFamilies.has(pokemon.name)) {
+              searchResults.push(pokemon);
+            }
+          }
+          
+          filteredPokemon = searchResults;
         }
         
         // Apply pagination to filtered results
+        const isFiltered = isNameSearch || isOtherFiltered;
         const startIndex = isFiltered ? input.offset : 0;
         const endIndex = startIndex + input.limit;
         const paginatedResults = filteredPokemon.slice(startIndex, endIndex);
@@ -172,7 +286,10 @@ export const pokemonRouter = createTRPCRouter({
           results: paginatedResults,
         };
       } catch (error) {
-        console.error('Error in getListWithDetails:', error);
+        logger.error('Error in getListWithDetails', { 
+          error, 
+          input: { ...input, nameSearch: input.nameSearch ? '[REDACTED]' : undefined } 
+        });
         throw new Error("Failed to fetch Pokemon with details");
       }
     }),
@@ -193,31 +310,5 @@ export const pokemonRouter = createTRPCRouter({
       return PokemonSchema.parse(data);
     }),
 
-  search: publicProcedure
-    .input(z.object({
-      query: z.string().min(1),
-      limit: z.number().min(1).max(50).default(20),
-    }))
-    .query(async ({ input }) => {
-      // For a simple search, we'll get the first 1000 Pokemon and filter
-      const response = await fetch(`${POKEAPI_BASE_URL}/pokemon?limit=1000`);
-      
-      if (!response.ok) {
-        throw new Error("Failed to search Pokemon");
-      }
-      
-      const data = await response.json();
-      const parsedData = PokemonListResponseSchema.parse(data);
-      
-      // Filter by name
-      const filtered = parsedData.results.filter((pokemon) =>
-        pokemon.name.toLowerCase().includes(input.query.toLowerCase())
-      );
-      
-      return {
-        ...parsedData,
-        results: filtered.slice(0, input.limit),
-        count: filtered.length,
-      };
-    }),
+
 }); 

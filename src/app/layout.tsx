@@ -3,12 +3,15 @@ import "~/styles/globals.css";
 import { Inter } from "next/font/google";
 import { type Metadata } from "next";
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
+
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
 import { TRPCReactProvider } from "~/trpc/react";
 import { auth } from "~/server/auth";
 import { classNames } from "~/utils";
+import { SearchProvider } from "~/contexts/search-context";
+import { NavbarSearch } from "~/app/_components/navbar-search";
+import { ErrorBoundary, SafeImage } from "~/components";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -16,13 +19,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Pokemon Tracker",
+  title: "Pokemon App",
   description: "Track and explore Pokemon with our modern Pokedex",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-const navigation = [
-  { name: 'Pokemon', href: '/', current: true },
+const navigation: { name: string; href: string; current: boolean }[] = [
+  // { name: 'Pokemon', href: '/', current: true },
 ]
 
 const userNavigation = [
@@ -33,9 +36,9 @@ async function NavbarContent() {
   const session = await auth();
   
   const user = session?.user ? {
-    name: session.user.name || 'User',
-    email: session.user.email || '',
-    imageUrl: session.user.image || '/favicon.ico', // Use local favicon as fallback
+    name: session.user.name ?? 'User',
+    email: session.user.email ?? '',
+    imageUrl: session.user.image ?? '/favicon.ico', // Use local favicon as fallback
   } : null;
 
   return (
@@ -44,28 +47,20 @@ async function NavbarContent() {
         <div className="relative flex h-16 justify-between">
           <div className="relative z-10 flex px-2 lg:px-0">
             <div className="flex shrink-0 items-center">
-              <img
+              <SafeImage
                 alt="Pokemon Tracker"
                 src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
-                className="h-8 w-auto"
+                width={32}
+                height={32}
+                className="h-8 w-8"
+                priority
               />
-              <span className="ml-2 text-xl font-bold text-gray-900">PokeDex</span>
+              <span className="ml-2 text-xl font-bold text-gray-900">Pokemon</span>
             </div>
           </div>
-          <div className="relative z-0 flex flex-1 items-center justify-center px-2 sm:absolute sm:inset-0">
-            <div className="grid w-full grid-cols-1 sm:max-w-xs">
-              <input
-                name="search"
-                type="search"
-                placeholder="Search Pokemon..."
-                className="col-start-1 row-start-1 block w-full rounded-md bg-white py-1.5 pr-3 pl-10 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-400 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-              />
-              <MagnifyingGlassIcon
-                aria-hidden="true"
-                className="pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-gray-600"
-              />
-            </div>
-          </div>
+          
+          <NavbarSearch />
+
           <div className="relative z-10 flex items-center lg:hidden">
             {/* Mobile menu button */}
             <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-600 hover:bg-gray-100 hover:text-gray-700 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden focus:ring-inset">
@@ -84,7 +79,13 @@ async function NavbarContent() {
                 <MenuButton className="relative flex rounded-full bg-white focus:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2">
                   <span className="absolute -inset-1.5" />
                   <span className="sr-only">Open user menu</span>
-                  <img alt="" src={user.imageUrl} className="size-8 rounded-full" />
+                  <SafeImage 
+                    alt={`${user.name} avatar`} 
+                    src={user.imageUrl} 
+                    width={32}
+                    height={32}
+                    className="size-8 rounded-full" 
+                  />
                 </MenuButton>
 
                 <MenuItems
@@ -151,7 +152,13 @@ async function NavbarContent() {
           <div className="border-t border-gray-200 pt-4 pb-3">
             <div className="flex items-center px-4">
               <div className="shrink-0">
-                <img alt="" src={user.imageUrl} className="size-10 rounded-full" />
+                <SafeImage 
+                  alt={`${user.name} avatar`} 
+                  src={user.imageUrl} 
+                  width={40}
+                  height={40}
+                  className="size-10 rounded-full" 
+                />
               </div>
               <div className="ml-3">
                 <div className="text-base font-medium text-gray-800">{user.name}</div>
@@ -198,18 +205,22 @@ export default async function RootLayout({
       <body className="h-full bg-white" style={{
         background: 'radial-gradient(circle at 25% 50%, rgba(255, 140, 0, 0.12) 0%, rgba(255, 140, 0, 0.06) 35%, rgba(255, 255, 255, 1) 60%)'
       }}>
-        <TRPCReactProvider>
-          <div className="min-h-full">
-            <NavbarContent />
-            <div className="py-10">
-              <main>
-                <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                  {children}
+        <ErrorBoundary>
+          <TRPCReactProvider>
+            <SearchProvider>
+              <div className="min-h-full">
+                <NavbarContent />
+                <div className="py-10">
+                  <main>
+                    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+                      {children}
+                    </div>
+                  </main>
                 </div>
-              </main>
-            </div>
-          </div>
-        </TRPCReactProvider>
+              </div>
+            </SearchProvider>
+          </TRPCReactProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

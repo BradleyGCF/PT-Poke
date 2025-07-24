@@ -12,6 +12,21 @@ const config = {
         hostname: "raw.githubusercontent.com",
         pathname: "/PokeAPI/sprites/**",
       },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.discordapp.com",
+        pathname: "/**",
+      },
     ],
   },
 };

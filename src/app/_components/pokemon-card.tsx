@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
-import { Card } from "~/components";
+import { Card, SafeImage } from "~/components";
 import { getTypeColor } from "~/constants/pokemon";
 import type { PokemonListItemWithDetails } from "~/types/pokemon";
 
@@ -11,7 +9,6 @@ interface PokemonCardProps {
 }
 
 export function PokemonCard({ pokemon }: PokemonCardProps) {
-  const [imageError, setImageError] = useState(false);
 
   return (
     <Card>
@@ -19,16 +16,17 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
         {/* Pokemon Image */}
         <div className="flex justify-center mb-4">
           <div className="w-24 h-24 relative">
-            {pokemon.sprite && !imageError ? (
-              <Image
+            {pokemon.sprite ? (
+              <SafeImage
                 src={pokemon.sprite}
                 alt={pokemon.name}
-                fill
-                className="object-contain"
-                onError={() => setImageError(true)}
+                width={96}
+                height={96}
+                className="w-full h-full object-contain"
+                fallbackSrc="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='32'%3E🔍%3C/text%3E%3C/svg%3E"
               />
             ) : (
-              <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center">
+              <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
                 <span className="text-gray-400 text-sm">No Image</span>
               </div>
             )}

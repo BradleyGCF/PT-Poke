@@ -9,7 +9,7 @@ export default async function Home() {
           Pokemon Collection
         </h1>
         <p className="mt-3 text-xl text-gray-500">
-          Explore all Pokemon from every generation, ordered by Pokedex number
+        Discover, explore, and master every Pokémon from all generations — all in one place.
         </p>
       </div>
 

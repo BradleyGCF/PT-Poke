@@ -35,8 +35,8 @@ export function Button({
         "font-semibold rounded-lg shadow-sm transition-all duration-200 ease-in-out hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2",
         buttonVariants[variant],
         buttonSizes[size],
-        (disabled || isLoading) ? "opacity-50 cursor-not-allowed" : "",
-        className || ""
+        (disabled ?? isLoading) ? "opacity-50 cursor-not-allowed" : "",
+        className ?? ""
       )}
       disabled={disabled || isLoading}
       {...props}
