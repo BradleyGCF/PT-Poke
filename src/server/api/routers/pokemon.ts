@@ -5,7 +5,11 @@ import {
   PokemonListResponseSchema,
   PokemonSpeciesSchema,
   PokemonListItemWithDetailsSchema,
-  type PokemonListItemWithDetails 
+  PokemonDetailedSchema,
+  EvolutionItemSchema,
+  type PokemonListItemWithDetails,
+  type PokemonDetailed,
+  type EvolutionItem 
 } from "~/types/pokemon";
 import { logger } from "~/utils";
 
@@ -68,6 +72,39 @@ async function getEvolutionChain(speciesUrl: string): Promise<string[]> {
     return pokemonNames;
   } catch (error) {
     logger.error('Error fetching evolution chain', { error, speciesUrl });
+    return [];
+  }
+}
+
+// Helper function to get detailed evolution information
+async function getDetailedEvolutions(speciesUrl: string): Promise<EvolutionItem[]> {
+  try {
+    const evolutionNames = await getEvolutionChain(speciesUrl);
+    const evolutions: EvolutionItem[] = [];
+    
+    for (const name of evolutionNames) {
+      try {
+        const pokemonResponse = await fetch(`${POKEAPI_BASE_URL}/pokemon/${name}`);
+        if (!pokemonResponse.ok) continue;
+        
+        const pokemonData = await pokemonResponse.json();
+        const parsedPokemon = PokemonSchema.parse(pokemonData);
+        
+        evolutions.push(EvolutionItemSchema.parse({
+          id: parsedPokemon.id,
+          name: parsedPokemon.name,
+          sprite: parsedPokemon.sprites.other?.["official-artwork"]?.front_default || 
+                  parsedPokemon.sprites.front_default,
+        }));
+      } catch (error) {
+        logger.error(`Error fetching evolution details for ${name}`, { error });
+      }
+    }
+    
+    // Sort by ID to maintain evolution order
+    return evolutions.sort((a, b) => a.id - b.id);
+  } catch (error) {
+    logger.error('Error fetching detailed evolutions', { error, speciesUrl });
     return [];
   }
 }
@@ -181,7 +218,7 @@ export const pokemonRouter = createTRPCRouter({
                         parsedPokemon.sprites.front_default,
               });
             } catch (error) {
-              logger.error(`Error fetching details for Pokémon`, { 
+              logger.error(`Error fetching details for Pokemon`, { 
                 pokemonName: pokemon.name, 
                 error 
               });
@@ -310,5 +347,72 @@ export const pokemonRouter = createTRPCRouter({
       return PokemonSchema.parse(data);
     }),
 
+  getDetailedByNameOrId: publicProcedure
+    .input(z.string())
+    .query(async ({ input }): Promise<PokemonDetailed> => {
+      try {
+        // Get Pokemon details
+        const pokemonResponse = await fetch(`${POKEAPI_BASE_URL}/pokemon/${input.toLowerCase()}`);
+        
+        if (!pokemonResponse.ok) {
+          if (pokemonResponse.status === 404) {
+            throw new Error("Pokemon not found");
+          }
+          throw new Error("Failed to fetch Pokemon");
+        }
+        
+        const pokemonData = await pokemonResponse.json();
+        const parsedPokemon = PokemonSchema.parse(pokemonData);
+        
+        // Get species information for generation
+        const speciesResponse = await fetch(parsedPokemon.species.url);
+        if (!speciesResponse.ok) {
+          throw new Error("Failed to fetch Pokemon species");
+        }
+        
+        const speciesData = await speciesResponse.json();
+        const parsedSpecies = PokemonSpeciesSchema.parse(speciesData);
+        
+        // Get evolution chain
+        const evolutions = await getDetailedEvolutions(parsedPokemon.species.url);
+        
+        // Format the detailed Pokemon data
+        const detailedPokemon: PokemonDetailed = PokemonDetailedSchema.parse({
+          id: parsedPokemon.id,
+          name: parsedPokemon.name,
+          height: parsedPokemon.height,
+          weight: parsedPokemon.weight,
+          base_experience: parsedPokemon.base_experience,
+          types: parsedPokemon.types.map(t => t.type.name),
+          generation: getGenerationDisplayName(parsedSpecies.generation.name),
+          sprite: parsedPokemon.sprites.other?.["official-artwork"]?.front_default || 
+                  parsedPokemon.sprites.front_default,
+          sprites: {
+            front_default: parsedPokemon.sprites.front_default,
+            front_shiny: parsedPokemon.sprites.front_shiny,
+            back_default: (parsedPokemon.sprites as any).back_default ?? null,
+            back_shiny: (parsedPokemon.sprites as any).back_shiny ?? null,
+            official_artwork: parsedPokemon.sprites.other?.["official-artwork"]?.front_default,
+          },
+          stats: parsedPokemon.stats.map(stat => ({
+            name: stat.stat.name,
+            base_stat: stat.base_stat,
+          })),
+          abilities: parsedPokemon.abilities.map(ability => ({
+            name: ability.ability.name,
+            is_hidden: ability.is_hidden,
+          })),
+          evolutions,
+        });
+        
+        return detailedPokemon;
+      } catch (error) {
+        logger.error('Error in getDetailedByNameOrId', { 
+          error, 
+          input: input.slice(0, 50) // Truncate input for logging
+        });
+        throw error;
+      }
+    }),
 
 }); 

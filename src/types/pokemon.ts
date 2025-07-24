@@ -76,8 +76,49 @@ export const PokemonListItemWithDetailsSchema = z.object({
   sprite: z.string().nullable(),
 });
 
+// Evolution item schema
+export const EvolutionItemSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  sprite: z.string().nullable(),
+});
+
+// Detailed Pokemon schema for individual page
+export const PokemonDetailedSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  height: z.number(),
+  weight: z.number(),
+  base_experience: z.number().nullable(),
+  types: z.array(z.string()),
+  generation: z.string(),
+  sprite: z.string().nullable(),
+  sprites: z.object({
+    front_default: z.string().nullable(),
+    front_shiny: z.string().nullable(),
+    back_default: z.string().nullable(),
+    back_shiny: z.string().nullable(),
+    official_artwork: z.string().nullable(),
+  }),
+  stats: z.array(
+    z.object({
+      name: z.string(),
+      base_stat: z.number(),
+    })
+  ),
+  abilities: z.array(
+    z.object({
+      name: z.string(),
+      is_hidden: z.boolean(),
+    })
+  ),
+  evolutions: z.array(EvolutionItemSchema),
+});
+
 export type Pokemon = z.infer<typeof PokemonSchema>;
 export type PokemonSpecies = z.infer<typeof PokemonSpeciesSchema>;
 export type PokemonListItem = z.infer<typeof PokemonListItemSchema>;
 export type PokemonListResponse = z.infer<typeof PokemonListResponseSchema>;
-export type PokemonListItemWithDetails = z.infer<typeof PokemonListItemWithDetailsSchema>; 
+export type PokemonListItemWithDetails = z.infer<typeof PokemonListItemWithDetailsSchema>;
+export type EvolutionItem = z.infer<typeof EvolutionItemSchema>;
+export type PokemonDetailed = z.infer<typeof PokemonDetailedSchema>; 

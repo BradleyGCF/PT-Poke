@@ -45,10 +45,10 @@ export function PokemonList({ initialLimit = 20 }: PokemonListProps) {
         <div className="max-w-md mx-auto">
           <div className="text-6xl mb-4">🔍</div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Unable to load Pokémon
+            Unable to load Pokemon
           </h2>
           <p className="text-gray-600 mb-6">
-            We&apos;re having trouble connecting to the Pokémon database. Please try again.
+            We&apos;re having trouble connecting to the Pokemon database. Please try again.
           </p>
           {process.env.NODE_ENV === 'development' && (
             <details className="mb-6 text-left bg-red-50 p-4 rounded-lg">
