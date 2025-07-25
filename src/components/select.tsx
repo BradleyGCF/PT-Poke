@@ -28,7 +28,7 @@ export function Select({
         <Label className="text-sm font-semibold text-gray-800">{label}:</Label>
         <div className="relative">
           <ListboxButton 
-            className="grid w-full cursor-default grid-cols-1 rounded-lg bg-white py-2.5 pr-8 pl-4 text-left text-gray-900 outline-1 -outline-offset-1 outline-gray-300 shadow-sm transition-all duration-200 ease-in-out hover:outline-gray-400 hover:shadow-md focus:outline-2 focus:-outline-offset-2 focus:outline-orange-400 sm:text-sm/6"
+            className="grid w-full cursor-default grid-cols-1 rounded-lg bg-white py-2.5 pr-8 pl-4 text-left text-gray-900 outline-1 -outline-offset-1 outline-gray-300 shadow-sm transition-all duration-200 ease-in-out hover:outline-gray-400 hover:shadow-md focus:outline-2 focus:-outline-offset-2 focus:outline-red-400 sm:text-sm/6"
             style={{ minWidth }}
           >
             <span className="col-start-1 row-start-1 truncate pr-6 font-medium">
@@ -50,13 +50,13 @@ export function Select({
               <ListboxOption
                 key={option.id}
                 value={option}
-                className="group relative cursor-default py-2.5 pr-9 pl-4 text-gray-900 select-none data-focus:bg-orange-400 data-focus:text-white data-focus:outline-hidden transition-colors duration-150"
+                className="group relative cursor-default py-2.5 pr-9 pl-4 text-gray-900 select-none data-focus:bg-red-400 data-focus:text-white data-focus:outline-hidden transition-colors duration-150"
               >
                 <span className="block truncate font-medium group-data-selected:font-semibold">
                   {option.name}
                 </span>
 
-                <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-orange-400 group-not-data-selected:hidden group-data-focus:text-white">
+                <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-red-400 group-not-data-selected:hidden group-data-focus:text-white">
                   <CheckIcon aria-hidden="true" className="size-5" />
                 </span>
               </ListboxOption>

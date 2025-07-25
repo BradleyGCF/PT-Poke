@@ -2,6 +2,7 @@ import "~/styles/globals.css";
 
 import { Inter } from "next/font/google";
 import { type Metadata } from "next";
+import { SessionProvider } from "next-auth/react";
 
 import { TRPCReactProvider } from "~/trpc/react";
 import { auth } from "~/server/auth";
@@ -17,19 +18,16 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Pokemon App",
   description: "Track and explore Pokemon with our modern Pokedex",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  icons: {
+    icon: "/favicon.ico?v=2",
+    shortcut: "/favicon.ico?v=2",
+    apple: "/favicon.ico?v=2",
+  },
 };
 
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const session = await auth();
-  
-  const user = session?.user ? {
-    name: session.user.name ?? 'User',
-    email: session.user.email ?? '',
-    imageUrl: session.user.image ?? '/favicon.ico', // Use local favicon as fallback
-  } : null;
 
   return (
     <html lang="en" className={`${inter.variable} h-full`}>
@@ -38,18 +36,20 @@ export default async function RootLayout({
       }}>
         <ErrorBoundary>
           <TRPCReactProvider>
-            <SearchProvider>
-              <div className="min-h-full">
-                <ConditionalNavbar user={user} session={session} />
-                <div className="py-10">
-                  <main>
-                    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                      {children}
-                    </div>
-                  </main>
+            <SessionProvider>
+              <SearchProvider>
+                <div className="min-h-full">
+                  <ConditionalNavbar />
+                  <div className="py-10">
+                    <main>
+                      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+                        {children}
+                      </div>
+                    </main>
+                  </div>
                 </div>
-              </div>
-            </SearchProvider>
+              </SearchProvider>
+            </SessionProvider>
           </TRPCReactProvider>
         </ErrorBoundary>
       </body>

@@ -27,7 +27,7 @@ export function PokemonDetails({ pokemon }: PokemonDetailsProps) {
     if (statValue >= 120) return "bg-green-500";
     if (statValue >= 90) return "bg-blue-500";
     if (statValue >= 60) return "bg-yellow-500";
-    if (statValue >= 30) return "bg-orange-500";
+    if (statValue >= 30) return "bg-red-500";
     return "bg-red-500";
   };
 
@@ -68,7 +68,7 @@ export function PokemonDetails({ pokemon }: PokemonDetailsProps) {
   const backgroundGradient = getCustomBackground(primaryType);
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative">
       {/* Custom Background for Pokemon Details Page */}
       <div 
         className="fixed inset-0 -z-10"
@@ -91,17 +91,17 @@ export function PokemonDetails({ pokemon }: PokemonDetailsProps) {
         </div>
 
         {/* Main Pokemon Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {/* Left Column - Sticky Pokemon Image */}
-          <div className="lg:sticky lg:top-8 lg:h-fit flex justify-center items-start">
-            <div className="w-[550px] h-[550px]">
+          <div className="sticky top-4 self-start flex justify-center items-start">
+            <div className="w-full max-w-[450px] h-[450px] lg:w-[550px] lg:h-[550px]">
               {pokemon.sprite ? (
                 <SafeImage
                   src={pokemon.sprite}
                   alt={pokemon.name}
                   width={450}
                   height={450}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain drop-shadow-lg"
                   fallbackSrc="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='450' height='450' viewBox='0 0 450 450'%3E%3Crect width='450' height='450' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='90'%3E🔍%3C/text%3E%3C/svg%3E"
                 />
               ) : (
@@ -232,7 +232,7 @@ export function PokemonDetails({ pokemon }: PokemonDetailsProps) {
                     href={`/pokemon/${evolution.name}`}
                     className={`group block ${
                       evolution.name === pokemon.name
-                        ? "ring-4 ring-orange-400 rounded-lg"
+                        ? "ring-4 ring-red-400 rounded-lg"
                         : "hover:ring-2 hover:ring-gray-300 rounded-lg transition-all"
                     }`}
                   >
@@ -260,13 +260,13 @@ export function PokemonDetails({ pokemon }: PokemonDetailsProps) {
                           </div>
                           <div className={`text-sm font-medium capitalize ${
                             evolution.name === pokemon.name
-                              ? "text-orange-600"
+                              ? "text-red-600"
                               : "text-gray-700 group-hover:text-gray-900"
                           }`}>
                             {evolution.name}
                           </div>
                           {evolution.name === pokemon.name && (
-                            <div className="text-xs text-orange-600 font-medium">
+                            <div className="text-xs text-red-600 font-medium">
                               Current
                             </div>
                           )}

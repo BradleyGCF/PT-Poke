@@ -199,11 +199,9 @@ export const pokemonRouter = createTRPCRouter({
           const batchResults = await Promise.all(
             batch.map(async (pokemon) => {
             try {
-              // Get Pokemon details
-              const pokemonData = await fetchPokemonDetails(pokemon.url);
+                      const pokemonData = await fetchPokemonDetails(pokemon.url);
               const parsedPokemon = PokemonSchema.parse(pokemonData);
               
-              // Get species information for generation
               const speciesResponse = await fetch(parsedPokemon.species.url);
               if (!speciesResponse.ok) throw new Error(`Failed to fetch species for ${pokemon.name}`);
               const speciesData = await speciesResponse.json();
@@ -222,7 +220,6 @@ export const pokemonRouter = createTRPCRouter({
                 pokemonName: pokemon.name, 
                 error 
               });
-              // Return basic info if detailed fetch fails
               const id = extractIdFromUrl(pokemon.url);
               return PokemonListItemWithDetailsSchema.parse({
                 id,
@@ -238,7 +235,6 @@ export const pokemonRouter = createTRPCRouter({
           detailedPokemon.push(...batchResults);
         }
         
-        // Sort by ID to maintain order
         detailedPokemon.sort((a, b) => a.id - b.id);
         
         // Apply filters if specified
@@ -351,7 +347,6 @@ export const pokemonRouter = createTRPCRouter({
     .input(z.string())
     .query(async ({ input }): Promise<PokemonDetailed> => {
       try {
-        // Get Pokemon details
         const pokemonResponse = await fetch(`${POKEAPI_BASE_URL}/pokemon/${input.toLowerCase()}`);
         
         if (!pokemonResponse.ok) {
@@ -364,7 +359,6 @@ export const pokemonRouter = createTRPCRouter({
         const pokemonData = await pokemonResponse.json();
         const parsedPokemon = PokemonSchema.parse(pokemonData);
         
-        // Get species information for generation
         const speciesResponse = await fetch(parsedPokemon.species.url);
         if (!speciesResponse.ok) {
           throw new Error("Failed to fetch Pokemon species");
@@ -373,10 +367,8 @@ export const pokemonRouter = createTRPCRouter({
         const speciesData = await speciesResponse.json();
         const parsedSpecies = PokemonSpeciesSchema.parse(speciesData);
         
-        // Get evolution chain
         const evolutions = await getDetailedEvolutions(parsedPokemon.species.url);
         
-        // Format the detailed Pokemon data
         const detailedPokemon: PokemonDetailed = PokemonDetailedSchema.parse({
           id: parsedPokemon.id,
           name: parsedPokemon.name,
@@ -390,8 +382,8 @@ export const pokemonRouter = createTRPCRouter({
           sprites: {
             front_default: parsedPokemon.sprites.front_default,
             front_shiny: parsedPokemon.sprites.front_shiny,
-            back_default: (parsedPokemon.sprites as any).back_default ?? null,
-            back_shiny: (parsedPokemon.sprites as any).back_shiny ?? null,
+            back_default: (parsedPokemon.sprites as { back_default?: string | null }).back_default ?? null,
+            back_shiny: (parsedPokemon.sprites as { back_shiny?: string | null }).back_shiny ?? null,
             official_artwork: parsedPokemon.sprites.other?.["official-artwork"]?.front_default,
           },
           stats: parsedPokemon.stats.map(stat => ({
@@ -415,4 +407,4 @@ export const pokemonRouter = createTRPCRouter({
       }
     }),
 
-}); 
+});

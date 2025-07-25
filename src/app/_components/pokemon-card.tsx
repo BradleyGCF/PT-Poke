@@ -40,7 +40,7 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
           </div>
 
           {/* Pokemon Name */}
-          <h3 className="text-lg font-semibold text-center mb-3 capitalize group-hover:text-orange-600 transition-colors">
+                      <h3 className="text-lg font-semibold text-center mb-3 capitalize group-hover:text-red-600 transition-colors">
             {pokemon.name}
           </h3>
 

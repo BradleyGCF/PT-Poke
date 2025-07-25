@@ -9,10 +9,10 @@ export const env = createEnv({
   server: {
     AUTH_SECRET:
       process.env.NODE_ENV === "production"
-        ? z.string()
+        ? z.string().min(1)
         : z.string().optional(),
-    AUTH_GOOGLE_ID: z.string().optional(),
-    AUTH_GOOGLE_SECRET: z.string().optional(),
+    AUTH_GOOGLE_ID: z.string().min(1, "Google OAuth Client ID is required"),
+    AUTH_GOOGLE_SECRET: z.string().min(1, "Google OAuth Client Secret is required"),
     DATABASE_URL: z.string().url(),
     NEXTAUTH_URL: z.string().url().optional(),
     NODE_ENV: z

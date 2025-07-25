@@ -141,7 +141,7 @@ export function PokemonList({ initialLimit = 20 }: PokemonListProps) {
       {/* Loading state */}
       {isLoading && (
         <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-orange-400"></div>
+                      <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-red-400"></div>
           <p className="mt-4 text-lg font-medium text-gray-700">
             {searchTerm ? 'Searching Pokemon and their evolutions...' : 'Loading Pokemon...'}
           </p>
@@ -170,7 +170,7 @@ export function PokemonList({ initialLimit = 20 }: PokemonListProps) {
                 )}
               </p>
               {(typeFilter || generationFilter || searchTerm) && (
-                <Button onClick={clearFilters} className="mt-2">
+                <Button onClick={clearFilters} className="mt-2 text-white bg-red-500 hover:bg-red-600">
                   Clear all filters
                 </Button>
               )}

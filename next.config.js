@@ -27,6 +27,11 @@ const config = {
         hostname: "cdn.discordapp.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "ui-avatars.com",
+        pathname: "/api/**",
+      },
     ],
   },
 };

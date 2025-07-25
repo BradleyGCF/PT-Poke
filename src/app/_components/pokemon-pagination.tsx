@@ -70,7 +70,7 @@ export function PokemonPagination({
         aria-current={isCurrentPage ? "page" : undefined}
         className={`inline-flex items-center border-t-2 px-4 pt-4 text-sm font-medium ${
           isCurrentPage
-            ? "border-orange-400 text-orange-500"
+                            ? "border-red-400 text-red-500"
             : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
         }`}
       >

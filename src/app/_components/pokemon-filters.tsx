@@ -37,7 +37,7 @@ export function PokemonFilters({
         <div className="flex justify-end">
           <button
             onClick={onClearFilters}
-            className="text-sm text-orange-600 hover:text-orange-500 font-medium transition-colors duration-200"
+            className="text-sm text-red-600 hover:text-red-500 font-medium transition-colors duration-200"
           >
             Clear Filters
           </button>
@@ -90,11 +90,11 @@ export function PokemonFilters({
       {hasActiveFilters && (
         <div className="flex flex-wrap gap-2">
           {filters.typeFilter && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-3 py-1 text-sm font-medium text-orange-800">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-800">
               Type: {TYPE_OPTIONS.find(t => t.value === filters.typeFilter)?.name}
               <button
                 onClick={() => onTypeChange('')}
-                className="ml-1 text-orange-600 hover:text-orange-500"
+                                  className="ml-1 text-red-600 hover:text-red-500"
               >
                 ×
               </button>

@@ -1,38 +1,38 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { SafeImage } from "~/components";
 import { NavbarSearch } from "./navbar-search";
-import { classNames } from "~/utils";
-
-interface ConditionalNavbarProps {
-  user: {
-    name: string;
-    email: string;
-    imageUrl: string;
-  } | null;
-  session: any;
-}
+import { classNames, getUserAvatar } from "~/utils";
 
 const navigation: { name: string; href: string; current: boolean }[] = [
   // { name: 'Pokemon', href: '/', current: true },
 ]
 
-const userNavigation = [
-  { name: 'Sign out', href: '/api/auth/signout' },
-]
-
-export function ConditionalNavbar({ user, session }: ConditionalNavbarProps) {
+export function ConditionalNavbar() {
+  const { data: session } = useSession();
+  
+  const user = session?.user ? {
+    name: session.user.name ?? 'User',
+    email: session.user.email ?? '',
+    imageUrl: getUserAvatar(session.user),
+  } : null;
   const pathname = usePathname();
   
-  // Hide navbar on Pokemon detail pages
+  // Hide navbar on Pokemon detail pages and landing page
   const isPokemonDetailPage = pathname?.startsWith('/pokemon/') && pathname !== '/pokemon';
+  const isLandingPage = pathname === '/';
   
-  if (isPokemonDetailPage) {
+  if (isPokemonDetailPage || isLandingPage) {
     return null;
   }
+
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: "/" });
+  };
 
   return (
     <Disclosure as="header" className="bg-white shadow-sm">
@@ -42,7 +42,7 @@ export function ConditionalNavbar({ user, session }: ConditionalNavbarProps) {
             <div className="flex shrink-0 items-center">
               <SafeImage
                 alt="Pokemon Tracker"
-                src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
+                src="/logo.png"
                 width={32}
                 height={32}
                 className="h-8 w-8"
@@ -84,22 +84,20 @@ export function ConditionalNavbar({ user, session }: ConditionalNavbarProps) {
                   transition
                   className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
                 >
-                  {userNavigation.map((item) => (
-                    <MenuItem key={item.name}>
-                      <a
-                        href={item.href}
-                        className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
-                      >
-                        {item.name}
-                      </a>
-                    </MenuItem>
-                  ))}
+                  <MenuItem>
+                    <button
+                      onClick={handleSignOut}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                    >
+                      Sign out
+                    </button>
+                  </MenuItem>
                 </MenuItems>
               </Menu>
                          ) : (
                <a
                  href="/api/auth/signin"
-                 className="ml-4 rounded-md bg-orange-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400"
+                 className="ml-4 rounded-md bg-red-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400"
                >
                  Sign in
                </a>
@@ -159,16 +157,13 @@ export function ConditionalNavbar({ user, session }: ConditionalNavbarProps) {
 
             </div>
             <div className="mt-3 space-y-1 px-2">
-              {userNavigation.map((item) => (
-                <DisclosureButton
-                  key={item.name}
-                  as="a"
-                  href={item.href}
-                  className="block rounded-md px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                >
-                  {item.name}
-                </DisclosureButton>
-              ))}
+              <DisclosureButton
+                as="button"
+                onClick={handleSignOut}
+                className="block w-full text-left rounded-md px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                Sign out
+              </DisclosureButton>
             </div>
           </div>
         )}
@@ -177,7 +172,7 @@ export function ConditionalNavbar({ user, session }: ConditionalNavbarProps) {
             <div className="px-2">
               <a
                 href="/api/auth/signin"
-                className="block rounded-md bg-orange-400 px-3 py-2 text-base font-medium text-white shadow-sm hover:bg-orange-500"
+                className="block rounded-md bg-red-400 px-3 py-2 text-base font-medium text-white shadow-sm hover:bg-red-500"
               >
                 Sign in
               </a>

@@ -4,7 +4,7 @@ type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 interface LogEntry {
   level: LogLevel;
   message: string;
-  data?: any;
+  data?: unknown;
   timestamp: string;
 }
 
@@ -12,7 +12,7 @@ class Logger {
   private isProduction = process.env.NODE_ENV === 'production';
   private isDevelopment = process.env.NODE_ENV === 'development';
 
-  private formatLog(level: LogLevel, message: string, data?: any): LogEntry {
+  private formatLog(level: LogLevel, message: string, data?: unknown): LogEntry {
     return {
       level,
       message,
@@ -30,7 +30,7 @@ class Logger {
     return true;
   }
 
-  info(message: string, data?: any): void {
+  info(message: string, data?: unknown): void {
     if (!this.shouldLog('info')) return;
     
     if (this.isDevelopment) {
@@ -38,7 +38,7 @@ class Logger {
     }
   }
 
-  warn(message: string, data?: any): void {
+  warn(message: string, data?: unknown): void {
     if (!this.shouldLog('warn')) return;
     
     if (this.isDevelopment) {
@@ -46,7 +46,7 @@ class Logger {
     }
   }
 
-  error(message: string, data?: any): void {
+  error(message: string, data?: unknown): void {
     if (!this.shouldLog('error')) return;
     
     if (this.isDevelopment) {
@@ -57,7 +57,7 @@ class Logger {
     }
   }
 
-  debug(message: string, data?: any): void {
+  debug(message: string, data?: unknown): void {
     if (!this.shouldLog('debug')) return;
     
     if (this.isDevelopment) {
@@ -66,4 +66,4 @@ class Logger {
   }
 }
 
-export const logger = new Logger(); 
+export const logger = new Logger();

@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { api } from "~/trpc/server";
 import { PokemonDetails } from "../../_components";
 
@@ -20,7 +20,7 @@ export default async function PokemonPage({ params }: PokemonPageProps) {
     );
   } catch (error) {
     console.error("Error loading Pokemon:", error);
-    notFound();
+    redirect("/");
   }
 }
 
@@ -35,8 +35,8 @@ export async function generateMetadata({ params }: PokemonPageProps) {
     };
   } catch {
     return {
-      title: "Pokemon Not Found",
-      description: "The requested Pokemon could not be found.",
+      title: "Pokemon App",
+      description: "Pokemon application.",
     };
   }
 } 

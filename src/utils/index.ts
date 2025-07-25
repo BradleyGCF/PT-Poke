@@ -4,5 +4,5 @@ export function classNames(...classes: string[]) {
 
 export * from "./hooks";
 
-// Logger utility
+export * from "./avatar";
 export { logger } from "./logger"; 
