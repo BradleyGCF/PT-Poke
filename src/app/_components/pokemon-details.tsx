@@ -31,15 +31,15 @@ export function PokemonDetails({ pokemon }: PokemonDetailsProps) {
     return "bg-red-500";
   };
 
-  const handleBackClick = () => {
-    // Always navigate to home page
-    router.push('/');
+  // Navigate back to the Pokemon list
+  const handleBackClick = () => {    
+    router.push('/collection');
   };
 
   // Get the primary type for background
   const primaryType = pokemon.types[0] || 'normal';
 
-  // Custom background configuration - Easy to modify
+  // Custom background configuration 
   const getCustomBackground = (type: string): string => {
     const backgrounds: Record<string, string> = {
       normal: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)',

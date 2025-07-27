@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure, protectedProcedure } from "~/server/api/trpc";
 import { 
   PokemonSchema, 
   PokemonListResponseSchema,
@@ -405,6 +405,12 @@ export const pokemonRouter = createTRPCRouter({
         });
         throw error;
       }
+    }),
+
+  someProtectedEndpoint: protectedProcedure
+    .input(z.object({ /* ... */ }))
+    .mutation(async ({ ctx, input }) => {
+      // Only authenticated users can reach this point
     }),
 
 });
