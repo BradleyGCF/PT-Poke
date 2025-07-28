@@ -4,7 +4,7 @@ import { logger } from "~/utils";
 const POKEAPI_BASE_URL = "https://pokeapi.co/api/v2";
 
 export function extractIdFromUrl(url: string): number {
-  const matches = url.match(/\/(\d+)\/$/);
+  const matches = /\/(\d+)\/$/.exec(url);
   return matches ? parseInt(matches[1]!, 10) : 0;
 }
 
@@ -63,7 +63,7 @@ export async function getDetailedEvolutions(speciesUrl: string): Promise<Evoluti
         evolutions.push(EvolutionItemSchema.parse({
           id: parsedPokemon.id,
           name: parsedPokemon.name,
-          sprite: parsedPokemon.sprites.other?.["official-artwork"]?.front_default || parsedPokemon.sprites.front_default,
+          sprite: parsedPokemon.sprites.other?.["official-artwork"]?.front_default ?? parsedPokemon.sprites.front_default,
         }));
       } catch (error) {
         logger.error(`Error fetching evolution details for ${name}`, { error });
@@ -142,7 +142,7 @@ export async function getListWithDetailsService(input: {
               name: parsedPokemon.name,
               types: parsedPokemon.types.map(t => t.type.name),
               generation: getGenerationDisplayName(parsedSpecies.generation.name),
-              sprite: parsedPokemon.sprites.other?.["official-artwork"]?.front_default || parsedPokemon.sprites.front_default,
+              sprite: parsedPokemon.sprites.other?.["official-artwork"]?.front_default ?? parsedPokemon.sprites.front_default,
             });
           } catch (error) {
             logger.error(`Error fetching details for Pokemon`, { pokemonName: pokemon.name, error });

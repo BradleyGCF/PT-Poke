@@ -37,7 +37,7 @@ export function PokemonDetails({ pokemon }: PokemonDetailsProps) {
   };
 
   // Get the primary type for background
-  const primaryType = pokemon.types[0] || 'normal';
+  const primaryType = pokemon.types[0] ?? 'normal';
 
   // Custom background configuration 
   const getCustomBackground = (type: string): string => {
@@ -291,4 +291,4 @@ export function PokemonDetails({ pokemon }: PokemonDetailsProps) {
       </div>
     </div>
   );
-} 
+}

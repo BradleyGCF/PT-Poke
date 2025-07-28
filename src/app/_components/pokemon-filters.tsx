@@ -52,7 +52,7 @@ export function PokemonFilters({
           <Select
             label="Type:"
             options={TYPE_OPTIONS}
-            value={TYPE_OPTIONS.find(option => option.value === filters.typeFilter) || TYPE_OPTIONS[0]!}
+            value={TYPE_OPTIONS.find(option => option.value === filters.typeFilter) ?? TYPE_OPTIONS[0]}
             onChange={(selected) => onTypeChange(selected.value as string)}
             minWidth="150px"
           />
@@ -61,7 +61,7 @@ export function PokemonFilters({
           <Select
             label="Generation:"
             options={GENERATION_OPTIONS}
-            value={GENERATION_OPTIONS.find(option => option.value === filters.generationFilter) || GENERATION_OPTIONS[0]!}
+            value={GENERATION_OPTIONS.find(option => option.value === filters.generationFilter) ?? GENERATION_OPTIONS[0]}
             onChange={(selected) => onGenerationChange(selected.value as string)}
             minWidth="180px"
           />
@@ -70,7 +70,7 @@ export function PokemonFilters({
           <Select
             label="Show:"
             options={PER_PAGE_OPTIONS}
-            value={PER_PAGE_OPTIONS.find(option => option.value === filters.limit) || PER_PAGE_OPTIONS[1]!}
+            value={PER_PAGE_OPTIONS.find(option => option.value === filters.limit) ?? PER_PAGE_OPTIONS[1]}
             onChange={(selected) => onLimitChange(selected.value as number)}
             minWidth="120px"
           />
@@ -115,4 +115,4 @@ export function PokemonFilters({
       )}
     </div>
   );
-} 
+}

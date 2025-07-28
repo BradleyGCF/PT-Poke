@@ -38,7 +38,7 @@ export function Button({
         (disabled ?? isLoading) ? "opacity-50 cursor-not-allowed" : "",
         className ?? ""
       )}
-      disabled={disabled || isLoading}
+      disabled={disabled ?? isLoading}
       {...props}
     >
       {isLoading ? (
@@ -51,4 +51,4 @@ export function Button({
       )}
     </button>
   );
-} 
+}

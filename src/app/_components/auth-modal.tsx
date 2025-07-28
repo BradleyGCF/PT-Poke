@@ -15,7 +15,7 @@ interface AuthModalProps {
 export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [isLogin, setIsLogin] = useState(true);
   const router = useRouter();
-  const { data: session, update } = useSession();
+  const { update } = useSession(); 
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -65,22 +65,18 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           password: formData.password,
           redirect: false,
         });
-
         if (result?.error) {
           setError('Invalid email or password');
         } else if (result?.ok) {
           setSuccess('Login successful!');
-          
-                    await update();
-          
-          // Using timeout for more reliable redirection after session update
+          await update();
           setTimeout(() => {
             onClose();
             router.push('/collection');
           }, 1000);
         }
-              } else {
-          if (formData.password !== formData.confirmPassword) {
+      } else {
+        if (formData.password !== formData.confirmPassword) {
           setError('Passwords do not match');
           return;
         }
@@ -96,18 +92,16 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           body: JSON.stringify({
             email: formData.email,
             password: formData.password,
-            name: formData.name || null,
+            name: formData.name ?? null,
           }),
         });
-
-        const data = await response.json();
-
+        const data: { error?: string } = await response.json(); // Tipado seguro
         if (response.ok) {
           setSuccess('Account created successfully! Please sign in.');
           setIsLogin(true);
           setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
         } else {
-          setError(data.error || 'Registration failed');
+          setError(data?.error ?? 'Registration failed'); // Uso nullish coalescing y acceso seguro
         }
       }
     } catch (error) {
@@ -324,4 +318,4 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
       </div>
     </Dialog>
   );
-} 
+}

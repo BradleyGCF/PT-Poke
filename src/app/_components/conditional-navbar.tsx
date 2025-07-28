@@ -7,6 +7,7 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { SafeImage } from "~/components";
 import { NavbarSearch } from "./navbar-search";
 import { classNames, getUserAvatar } from "~/utils";
+import Link from "next/link";
 
 const navigation: { name: string; href: string; current: boolean }[] = [
   // { name: 'Pokemon', href: '/', current: true },
@@ -95,12 +96,12 @@ export function ConditionalNavbar() {
                 </MenuItems>
               </Menu>
                          ) : (
-               <a
+               <Link
                  href="/api/auth/signin"
                  className="ml-4 rounded-md bg-red-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400"
                >
                  Sign in
-               </a>
+               </Link>
              )}
           </div>
         </div>
@@ -170,16 +171,16 @@ export function ConditionalNavbar() {
         {!session && (
           <div className="border-t border-gray-200 pt-4 pb-3">
             <div className="px-2">
-              <a
+              <Link
                 href="/api/auth/signin"
                 className="block rounded-md bg-red-400 px-3 py-2 text-base font-medium text-white shadow-sm hover:bg-red-500"
               >
                 Sign in
-              </a>
+              </Link>
             </div>
           </div>
         )}
       </DisclosurePanel>
     </Disclosure>
   );
-} 
+}

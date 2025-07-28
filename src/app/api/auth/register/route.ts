@@ -1,11 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import * as bcrypt from 'bcryptjs';
 import { db } from '~/server/db';
 import { generatePlaceholderAvatar } from '~/utils/avatar';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, name } = await request.json();
+    const { email, password, name }: { email: string; password: string; name?: string } = await request.json();
 
     if (!email || !password) {
       return NextResponse.json(
@@ -41,13 +42,13 @@ export async function POST(request: NextRequest) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
-    const avatarUrl = generatePlaceholderAvatar(name || null, email);
+    const avatarUrl = generatePlaceholderAvatar(name ?? null, email);
 
     const user = await db.user.create({
       data: {
         email,
         password: hashedPassword,
-        name: name || null,
+        name: name ?? null,
         image: avatarUrl,
       },
       select: {
@@ -74,4 +75,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

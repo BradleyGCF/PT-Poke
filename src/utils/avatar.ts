@@ -14,7 +14,7 @@ export function generatePlaceholderAvatar(name: string | null, email: string | n
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=ef4444&color=ffffff&size=128&font-size=0.5&bold=true&format=png`;
   }
   
-  const initial = (email && email[0]?.toUpperCase()) || 'U';
+  const initial = email?.[0]?.toUpperCase() ?? 'U';
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=ef4444&color=ffffff&size=128&font-size=0.5&bold=true&format=png`;
 }
 
@@ -27,4 +27,4 @@ export function getUserAvatar(user: { image?: string | null; name?: string | nul
   }
   
   return generatePlaceholderAvatar(user.name ?? null, user.email ?? null);
-} 
+}

@@ -5,7 +5,6 @@ import { type Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 
 import { TRPCReactProvider } from "~/trpc/react";
-import { auth } from "~/server/auth";
 import { SearchProvider } from "~/contexts/search-context";
 import { ErrorBoundary } from "~/components";
 import { ConditionalNavbar } from "~/app/_components";

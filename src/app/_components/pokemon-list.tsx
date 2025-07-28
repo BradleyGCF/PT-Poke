@@ -182,7 +182,7 @@ export function PokemonList({ initialLimit = 20 }: PokemonListProps) {
                   key={pokemon.id}
                   fallback={
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
-                      <div className="text-red-400 text-2xl mb-2">⚠️</div>
+                      <div className="text-red-400 text-2xl mb-2">0e0f</div>
                       <p className="text-sm text-red-600">
                         Error loading {pokemon.name}
                       </p>
@@ -211,4 +211,4 @@ export function PokemonList({ initialLimit = 20 }: PokemonListProps) {
       )}
     </div>
   );
-} 
+}

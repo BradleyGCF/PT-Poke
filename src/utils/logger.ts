@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
 interface LogEntry {

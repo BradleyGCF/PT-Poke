@@ -109,7 +109,7 @@ export const pokemonRouter = createTRPCRouter({
           base_experience: parsedPokemon.base_experience,
           types: parsedPokemon.types.map(t => t.type.name),
           generation: getGenerationDisplayName(parsedSpecies.generation.name),
-          sprite: parsedPokemon.sprites.other?.["official-artwork"]?.front_default || 
+          sprite: parsedPokemon.sprites.other?.["official-artwork"]?.front_default ?? 
                   parsedPokemon.sprites.front_default,
           sprites: {
             front_default: parsedPokemon.sprites.front_default,
@@ -141,7 +141,7 @@ export const pokemonRouter = createTRPCRouter({
 
   someProtectedEndpoint: protectedProcedure
     .input(z.object({ /* ... */ }))
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async () => {
       // Only authenticated users can reach this point
     }),
 
