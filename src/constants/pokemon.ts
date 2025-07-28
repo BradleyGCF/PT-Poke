@@ -65,7 +65,6 @@ export const TYPE_COLORS: Record<string, string> = {
   fairy: "bg-pink-300",
 } as const;
 
-// Helper function to get type color
 export function getTypeColor(type: string): string {
   return TYPE_COLORS[type] ?? "bg-gray-400";
 } 

@@ -58,7 +58,7 @@ export const authConfig = {
             }
           });
 
-          if (!user || !user.password) {
+          if (!user?.password) {
             return null;
           }
 

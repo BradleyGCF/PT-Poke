@@ -33,7 +33,7 @@ export const pokemonRouter = createTRPCRouter({
         throw new Error("Failed to fetch Pokemon list");
       }
       
-      const data = await response.json();
+      const data: unknown = await response.json();
       const parsed = PokemonListResponseSchema.parse(data);
       return parsed;
     }),
@@ -72,7 +72,7 @@ export const pokemonRouter = createTRPCRouter({
         throw new Error("Failed to fetch Pokemon");
       }
       
-      const data = await response.json();
+      const data: unknown = await response.json();
       const parsed = PokemonSchema.parse(data);
       return parsed;
     }),
@@ -90,7 +90,7 @@ export const pokemonRouter = createTRPCRouter({
           throw new Error("Failed to fetch Pokemon");
         }
         
-        const pokemonData = await pokemonResponse.json();
+        const pokemonData: unknown = await pokemonResponse.json();
         const parsedPokemon = PokemonSchema.parse(pokemonData);
         
         const speciesResponse = await fetch(parsedPokemon.species.url);
@@ -98,7 +98,7 @@ export const pokemonRouter = createTRPCRouter({
           throw new Error("Failed to fetch Pokemon species");
         }
         
-        const speciesData = await speciesResponse.json();
+        const speciesData: unknown = await speciesResponse.json();
         const parsedSpecies = PokemonSpeciesSchema.parse(speciesData);
         
         const evolutions = await getDetailedEvolutions(parsedPokemon.species.url);

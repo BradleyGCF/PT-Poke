@@ -3,6 +3,10 @@ import { logger } from "~/utils";
 
 const POKEAPI_BASE_URL = "https://pokeapi.co/api/v2";
 
+const pokemonCache = new Map<string, PokemonListItemWithDetails>();
+const cacheExpiry = new Map<string, number>();
+const CACHE_DURATION = 5 * 60 * 1000;
+
 export function extractIdFromUrl(url: string): number {
   const matches = /\/(\d+)\/$/.exec(url);
   return matches ? parseInt(matches[1]!, 10) : 0;
@@ -23,17 +27,86 @@ export function getGenerationDisplayName(generationName: string): string {
   return generationMap[generationName] ?? generationName;
 }
 
+function cleanExpiredCache() {
+  const now = Date.now();
+  for (const [key, expiry] of cacheExpiry.entries()) {
+    if (now > expiry) {
+      pokemonCache.delete(key);
+      cacheExpiry.delete(key);
+    }
+  }
+}
+
+async function getCachedPokemonDetails(pokemon: { name: string; url: string }): Promise<PokemonListItemWithDetails | null> {
+  const cacheKey = pokemon.name;
+  const now = Date.now();
+  
+  if (pokemonCache.has(cacheKey)) {
+    const expiry = cacheExpiry.get(cacheKey);
+    if (expiry && now < expiry) {
+      return pokemonCache.get(cacheKey)!;
+    }
+  }
+
+  try {
+    const pokemonData = await fetchPokemonDetails(pokemon.url);
+    const parsedPokemon = PokemonSchema.parse(pokemonData);
+    const speciesResponse = await fetch(parsedPokemon.species.url);
+    if (!speciesResponse.ok) throw new Error(`Failed to fetch species for ${pokemon.name}`);
+    const speciesData: unknown = await speciesResponse.json();
+    const parsedSpecies = PokemonSpeciesSchema.parse(speciesData);
+    
+    const result = PokemonListItemWithDetailsSchema.parse({
+      id: parsedPokemon.id,
+      name: parsedPokemon.name,
+      types: parsedPokemon.types.map(t => t.type.name),
+      generation: getGenerationDisplayName(parsedSpecies.generation.name),
+      sprite: parsedPokemon.sprites.other?.["official-artwork"]?.front_default ?? parsedPokemon.sprites.front_default,
+    });
+
+    pokemonCache.set(cacheKey, result);
+    cacheExpiry.set(cacheKey, now + CACHE_DURATION);
+    
+    return result;
+  } catch (error) {
+    logger.error(`Error fetching details for Pokemon`, { pokemonName: pokemon.name, error });
+    const id = extractIdFromUrl(pokemon.url);
+    return PokemonListItemWithDetailsSchema.parse({
+      id,
+      name: pokemon.name,
+      types: [],
+      generation: 'Unknown',
+      sprite: null,
+    });
+  }
+}
+
 export async function getEvolutionChain(speciesUrl: string): Promise<string[]> {
   try {
     const speciesResponse = await fetch(speciesUrl);
     if (!speciesResponse.ok) return [];
-    const speciesData = await speciesResponse.json() as { evolution_chain?: { url: string } };
-    const evolutionChainUrl = speciesData.evolution_chain?.url;
+    const speciesData: unknown = await speciesResponse.json();
+    
+    if (!speciesData || typeof speciesData !== 'object' || !('evolution_chain' in speciesData)) {
+      return [];
+    }
+    
+    const speciesObj = speciesData as { evolution_chain?: { url: string } };
+    const evolutionChainUrl = speciesObj.evolution_chain?.url;
     if (!evolutionChainUrl) return [];
+    
     const evolutionResponse = await fetch(evolutionChainUrl);
     if (!evolutionResponse.ok) return [];
-    const evolutionData = await evolutionResponse.json() as { chain: EvolutionChainNode };
+    
+    const evolutionData: unknown = await evolutionResponse.json();
+    
+    if (!evolutionData || typeof evolutionData !== 'object' || !('chain' in evolutionData)) {
+      return [];
+    }
+    
+    const evolutionObj = evolutionData as { chain: EvolutionChainNode };
     const pokemonNames: string[] = [];
+    
     function extractEvolutions(evolution: EvolutionChainNode): void {
       if (evolution?.species?.name) {
         pokemonNames.push(evolution.species.name);
@@ -42,7 +115,8 @@ export async function getEvolutionChain(speciesUrl: string): Promise<string[]> {
         evolution.evolves_to.forEach((evo) => extractEvolutions(evo));
       }
     }
-    extractEvolutions(evolutionData.chain);
+    
+    extractEvolutions(evolutionObj.chain);
     return pokemonNames;
   } catch (error) {
     logger.error('Error fetching evolution chain', { error, speciesUrl });
@@ -58,7 +132,7 @@ export async function getDetailedEvolutions(speciesUrl: string): Promise<Evoluti
       try {
         const pokemonResponse = await fetch(`${POKEAPI_BASE_URL}/pokemon/${name}`);
         if (!pokemonResponse.ok) continue;
-        const pokemonData = await pokemonResponse.json();
+        const pokemonData: unknown = await pokemonResponse.json();
         const parsedPokemon = PokemonSchema.parse(pokemonData);
         evolutions.push(EvolutionItemSchema.parse({
           id: parsedPokemon.id,
@@ -107,61 +181,64 @@ export async function getListWithDetailsService(input: {
   nameSearch?: string;
 }) {
   try {
+    cleanExpiredCache();
+    
     const isNameSearch = !!input.nameSearch;
-    const isOtherFiltered = (input.typeFilter && input.typeFilter.trim() !== '') || 
+    const isOtherFiltered = (input.typeFilter && input.typeFilter.trim() !== '') ?? 
                             (input.generationFilter && input.generationFilter.trim() !== '');
-    const batchSize = isNameSearch ? 1000 : (isOtherFiltered ? 1000 : input.limit);
+    
+    let batchSize: number;
+    if (isNameSearch) {
+      batchSize = 400; 
+    } else if (input.generationFilter) {
+      batchSize = 1000; 
+    } else if (input.typeFilter) {
+      batchSize = 600; 
+    } else {
+      batchSize = input.limit; 
+    }
+    
     const fetchOffset = (isNameSearch || isOtherFiltered) ? 0 : input.offset;
 
-    // First get the basic list
     const response = await fetch(
       `${POKEAPI_BASE_URL}/pokemon?limit=${batchSize}&offset=${fetchOffset}`
     );
     if (!response.ok) {
       throw new Error("Failed to fetch Pokemon list");
     }
-    const listData = await response.json();
+    const listData: unknown = await response.json();
     const pokemonList = PokemonListResponseSchema.parse(listData);
 
-    // Fetch detailed information for each Pokemon in smaller batches
     const detailedPokemon: PokemonListItemWithDetails[] = [];
-    const batchProcessSize = 20;
-    for (let i = 0; i < pokemonList.results.length; i += batchProcessSize) {
-      const batch = pokemonList.results.slice(i, i + batchProcessSize);
-      const batchResults = await Promise.all(
-        batch.map(async (pokemon) => {
-          try {
-            const pokemonData = await fetchPokemonDetails(pokemon.url);
-            const parsedPokemon = PokemonSchema.parse(pokemonData);
-            const speciesResponse = await fetch(parsedPokemon.species.url);
-            if (!speciesResponse.ok) throw new Error(`Failed to fetch species for ${pokemon.name}`);
-            const speciesData = await speciesResponse.json();
-            const parsedSpecies = PokemonSpeciesSchema.parse(speciesData);
-            return PokemonListItemWithDetailsSchema.parse({
-              id: parsedPokemon.id,
-              name: parsedPokemon.name,
-              types: parsedPokemon.types.map(t => t.type.name),
-              generation: getGenerationDisplayName(parsedSpecies.generation.name),
-              sprite: parsedPokemon.sprites.other?.["official-artwork"]?.front_default ?? parsedPokemon.sprites.front_default,
-            });
-          } catch (error) {
-            logger.error(`Error fetching details for Pokemon`, { pokemonName: pokemon.name, error });
-            const id = extractIdFromUrl(pokemon.url);
-            return PokemonListItemWithDetailsSchema.parse({
-              id,
-              name: pokemon.name,
-              types: [],
-              generation: 'Unknown',
-              sprite: null,
-            });
-          }
-        })
+    const batchProcessSize = 15; 
+    
+    if (isNameSearch) {
+      const normalizedSearch = normalizeSearchTerm(input.nameSearch!);
+      const quickMatches = pokemonList.results.filter(pokemon => 
+        normalizeSearchTerm(pokemon.name).includes(normalizedSearch)
       );
-      detailedPokemon.push(...batchResults);
+      
+      for (let i = 0; i < quickMatches.length; i += batchProcessSize) {
+        const batch = quickMatches.slice(i, i + batchProcessSize);
+        const batchResults = await Promise.all(
+          batch.map(pokemon => getCachedPokemonDetails(pokemon))
+        );
+        const validResults = batchResults.filter((result): result is PokemonListItemWithDetails => result !== null);
+        detailedPokemon.push(...validResults);
+      }
+    } else {
+      for (let i = 0; i < pokemonList.results.length; i += batchProcessSize) {
+        const batch = pokemonList.results.slice(i, i + batchProcessSize);
+        const batchResults = await Promise.all(
+          batch.map(pokemon => getCachedPokemonDetails(pokemon))
+        );
+        const validResults = batchResults.filter((result): result is PokemonListItemWithDetails => result !== null);
+        detailedPokemon.push(...validResults);
+      }
     }
+    
     detailedPokemon.sort((a, b) => a.id - b.id);
 
-    // Apply filters if specified
     let filteredPokemon = detailedPokemon;
     if (input.typeFilter && input.typeFilter.trim() !== '') {
       filteredPokemon = filteredPokemon.filter(pokemon => 
@@ -176,50 +253,107 @@ export async function getListWithDetailsService(input: {
       logger.debug('Generation filter applied', { 
         generation: input.generationFilter, 
         beforeCount, 
-        afterCount: filteredPokemon.length 
+        afterCount: filteredPokemon.length,
+        batchSize: batchSize
       });
     }
-    // Apply name search with evolution support
+    
     if (input.nameSearch) {
-      const searchResults: PokemonListItemWithDetails[] = [];
-      const normalizedSearch = normalizeSearchTerm(input.nameSearch);
+      logger.debug('Starting evolution search', { 
+        searchTerm: input.nameSearch, 
+        directMatches: filteredPokemon.length 
+      });
+      
+      const searchResults: PokemonListItemWithDetails[] = [...filteredPokemon];
       const evolutionFamilies = new Set<string>();
-      // First, find direct matches and get their evolution families
+      const evolutionPromises: Promise<void>[] = [];
+      
       for (const pokemon of filteredPokemon) {
-        if (normalizeSearchTerm(pokemon.name).includes(normalizedSearch)) {
-          searchResults.push(pokemon);
-          // Also get this Pokemon's evolution family to include relatives
-          try {
-            const pokemonDetails = await fetchPokemonDetails(pokemon.name);
-            const evolutionNames = await getEvolutionChain(pokemonDetails.species.url);
-            evolutionNames.forEach(name => evolutionFamilies.add(name));
-          } catch (error) {
-            logger.error('Error getting evolution family', { pokemonName: pokemon.name, error });
-          }
-        }
+        evolutionPromises.push(
+          (async () => {
+            try {
+              const pokemonDetails = await fetchPokemonDetails(pokemon.name);
+              const evolutionNames = await getEvolutionChain(pokemonDetails.species.url);
+              logger.debug('Evolution chain found', { 
+                pokemon: pokemon.name, 
+                evolutions: evolutionNames 
+              });
+              evolutionNames.forEach(name => evolutionFamilies.add(name));
+            } catch (error) {
+              logger.error('Error getting evolution family', { pokemonName: pokemon.name, error });
+            }
+          })()
+        );
       }
-      // Now add any Pokemon from those evolution families that aren't already included
-      for (const pokemon of filteredPokemon) {
-        if (!searchResults.some(p => p.name === pokemon.name) && evolutionFamilies.has(pokemon.name)) {
-          searchResults.push(pokemon);
-        }
+      
+      await Promise.all(evolutionPromises);
+      
+      const evolutionNamesToFetch = Array.from(evolutionFamilies).filter(name => 
+        !searchResults.some(p => p.name === name)
+      );
+      
+      logger.debug('Fetching missing evolutions', { 
+        evolutionFamilies: Array.from(evolutionFamilies),
+        missing: evolutionNamesToFetch 
+      });
+      
+      for (let i = 0; i < evolutionNamesToFetch.length; i += batchProcessSize) {
+        const batch = evolutionNamesToFetch.slice(i, i + batchProcessSize);
+        const evolutionResults = await Promise.all(
+          batch.map(async (pokemonName) => {
+            try {
+              const pokemonData = await fetchPokemonDetails(pokemonName);
+              const parsedPokemon = PokemonSchema.parse(pokemonData);
+              const speciesResponse = await fetch(parsedPokemon.species.url);
+              if (!speciesResponse.ok) throw new Error(`Failed to fetch species for ${pokemonName}`);
+              const speciesData: unknown = await speciesResponse.json();
+              const parsedSpecies = PokemonSpeciesSchema.parse(speciesData);
+              
+              return PokemonListItemWithDetailsSchema.parse({
+                id: parsedPokemon.id,
+                name: parsedPokemon.name,
+                types: parsedPokemon.types.map(t => t.type.name),
+                generation: getGenerationDisplayName(parsedSpecies.generation.name),
+                sprite: parsedPokemon.sprites.other?.["official-artwork"]?.front_default ?? parsedPokemon.sprites.front_default,
+              });
+            } catch (error) {
+              logger.error(`Error fetching evolution details for ${pokemonName}`, { error });
+              return null;
+            }
+          })
+        );
+        
+        const validEvolutions = evolutionResults.filter((result): result is PokemonListItemWithDetails => result !== null);
+        searchResults.push(...validEvolutions);
       }
-      filteredPokemon = searchResults;
+      
+      const uniqueResults = searchResults.filter((pokemon, index, self) => 
+        index === self.findIndex(p => p.id === pokemon.id)
+      );
+      
+      filteredPokemon = uniqueResults.sort((a, b) => a.id - b.id);
+      
+      logger.debug('Evolution search completed', { 
+        searchTerm: input.nameSearch,
+        finalResults: filteredPokemon.length,
+        pokemonFound: filteredPokemon.map(p => p.name)
+      });
     }
-    // Apply pagination to filtered results
+    
     const isFiltered = isNameSearch || isOtherFiltered;
     const startIndex = isFiltered ? input.offset : 0;
     const endIndex = startIndex + input.limit;
     const paginatedResults = filteredPokemon.slice(startIndex, endIndex);
-    // For filtered results, estimate total count (since we didn't fetch everything)
-    // For unfiltered results, use the API's total count
+    
+    const parsedListData = PokemonListResponseSchema.parse(listData);
     const totalCount = isFiltered ? 
       Math.max(filteredPokemon.length, input.offset + paginatedResults.length + (paginatedResults.length === input.limit ? input.limit : 0)) :
-      listData.count;
+      parsedListData.count;
     const hasNext = isFiltered ? 
       (filteredPokemon.length > endIndex) || (paginatedResults.length === input.limit && filteredPokemon.length === batchSize) :
-      !!listData.next;
+      !!parsedListData.next;
     const hasPrevious = startIndex > 0;
+    
     return {
       count: totalCount,
       next: hasNext ? `${startIndex + input.limit}` : null,

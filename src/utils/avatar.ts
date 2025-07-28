@@ -2,7 +2,7 @@
  * Generates a placeholder avatar for users registering with local credentials
  */
 export function generatePlaceholderAvatar(name: string | null, email: string | null): string {
-  if (name && name.trim()) {
+  if (name?.trim()) {
     const initials = name
       .trim()
       .split(' ')

@@ -9,9 +9,16 @@ import { PokemonPagination } from "./pokemon-pagination";
 import { useDebounce } from "~/utils/hooks";
 import { useSearch } from "~/contexts/search-context";
 import { logger } from "~/utils";
+import type { PokemonListItemWithDetails } from "~/types/pokemon";
 
 interface PokemonListProps {
   initialLimit?: number;
+}
+
+interface SafePokemonData {
+  count: number;
+  results: PokemonListItemWithDetails[];
+  next?: string;
 }
 
 export function PokemonList({ initialLimit = 20 }: PokemonListProps) {
@@ -20,7 +27,6 @@ export function PokemonList({ initialLimit = 20 }: PokemonListProps) {
   const [typeFilter, setTypeFilter] = useState<string>('');
   const [generationFilter, setGenerationFilter] = useState<string>('');
   
-  // Use search context from navbar
   const { searchTerm, setSearchTerm } = useSearch();
   const debouncedNameSearch = useDebounce(searchTerm, 500);
 
@@ -32,11 +38,9 @@ export function PokemonList({ initialLimit = 20 }: PokemonListProps) {
     nameSearch: debouncedNameSearch || undefined,
   });
 
-  // Add a type guard for data
-  const safeData = (data && typeof data === 'object' && 'results' in data && Array.isArray(data.results)) ? data as { count: number; results: any[]; next?: string } : { count: 0, results: [] };
+  const safeData: SafePokemonData = (data && typeof data === 'object' && 'results' in data && Array.isArray(data.results)) ? data as SafePokemonData : { count: 0, results: [] };
 
   if (error) {
-    // Log the error for monitoring
     logger.error('Pokemon list error', { 
       error: error.message, 
       filters: { typeFilter, generationFilter, searchTerm: debouncedNameSearch },
@@ -111,8 +115,6 @@ export function PokemonList({ initialLimit = 20 }: PokemonListProps) {
     setOffset(0);
   };
 
-
-
   const clearFilters = () => {
     setTypeFilter('');
     setGenerationFilter('');
@@ -126,7 +128,6 @@ export function PokemonList({ initialLimit = 20 }: PokemonListProps) {
 
   return (
     <div className="space-y-6">
-      {/* Filters */}
       <PokemonFilters
         filters={{
           typeFilter,
@@ -141,7 +142,6 @@ export function PokemonList({ initialLimit = 20 }: PokemonListProps) {
         offset={offset}
       />
 
-      {/* Loading state */}
       {isLoading && (
         <div className="text-center py-12">
                       <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-red-400"></div>
@@ -151,7 +151,6 @@ export function PokemonList({ initialLimit = 20 }: PokemonListProps) {
         </div>
       )}
 
-      {/* Pokemon Grid */}
       {data && (
         <>
           {safeData.results.length === 0 ? (
@@ -180,12 +179,12 @@ export function PokemonList({ initialLimit = 20 }: PokemonListProps) {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-              {safeData.results.map((pokemon) => (
+              {safeData.results.map((pokemon: PokemonListItemWithDetails) => (
                 <ErrorBoundary 
                   key={pokemon.id}
                   fallback={
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
-                      <div className="text-red-400 text-2xl mb-2">0e0f</div>
+                      <div className="text-red-400 text-2xl mb-2">0e0f</div>
                       <p className="text-sm text-red-600">
                         Error loading {pokemon.name}
                       </p>
@@ -198,7 +197,6 @@ export function PokemonList({ initialLimit = 20 }: PokemonListProps) {
             </div>
           )}
 
-          {/* Pagination */}
           {safeData.results.length > 0 && (
             <PokemonPagination
               offset={offset}
