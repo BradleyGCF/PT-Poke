@@ -1,6 +1,9 @@
 "use client";
 
-import { ArrowLongLeftIcon, ArrowLongRightIcon } from '@heroicons/react/20/solid';
+import {
+  ArrowLongLeftIcon,
+  ArrowLongRightIcon,
+} from "@heroicons/react/20/solid";
 
 interface PokemonPaginationProps {
   offset: number;
@@ -27,7 +30,7 @@ export function PokemonPagination({
   // Calculate which pages to show (show 5 pages around current)
   let startPage = Math.max(1, currentPage - 2);
   let endPage = Math.min(totalPages, currentPage + 2);
-  
+
   // Adjust range if at beginning or end
   if (endPage - startPage < 4) {
     if (startPage === 1) {
@@ -38,7 +41,7 @@ export function PokemonPagination({
   }
 
   const pages = [];
-  
+
   // Always show first page if not in range
   if (startPage > 1) {
     pages.push(
@@ -48,18 +51,21 @@ export function PokemonPagination({
         className="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
       >
         1
-      </button>
+      </button>,
     );
-    
+
     if (startPage > 2) {
       pages.push(
-        <span key="ellipsis-start" className="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500">
+        <span
+          key="ellipsis-start"
+          className="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500"
+        >
           ...
-        </span>
+        </span>,
       );
     }
   }
-  
+
   // Show page numbers in range
   for (let i = startPage; i <= endPage; i++) {
     const isCurrentPage = i === currentPage;
@@ -70,25 +76,28 @@ export function PokemonPagination({
         aria-current={isCurrentPage ? "page" : undefined}
         className={`inline-flex items-center border-t-2 px-4 pt-4 text-sm font-medium ${
           isCurrentPage
-                            ? "border-red-400 text-red-500"
+            ? "border-red-400 text-red-500"
             : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
         }`}
       >
         {i}
-      </button>
+      </button>,
     );
   }
-  
+
   // Always show last page if not in range
   if (endPage < totalPages) {
     if (endPage < totalPages - 1) {
       pages.push(
-        <span key="ellipsis-end" className="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500">
+        <span
+          key="ellipsis-end"
+          className="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500"
+        >
           ...
-        </span>
+        </span>,
       );
     }
-    
+
     pages.push(
       <button
         key={totalPages}
@@ -96,7 +105,7 @@ export function PokemonPagination({
         className="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
       >
         {totalPages}
-      </button>
+      </button>,
     );
   }
 
@@ -107,32 +116,36 @@ export function PokemonPagination({
           onClick={onPrevious}
           disabled={offset === 0}
           className={`inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium ${
-            offset === 0 
-              ? 'text-gray-300 cursor-not-allowed' 
-              : 'text-gray-500 hover:border-gray-300 hover:text-gray-700'
+            offset === 0
+              ? "cursor-not-allowed text-gray-300"
+              : "text-gray-500 hover:border-gray-300 hover:text-gray-700"
           }`}
         >
-          <ArrowLongLeftIcon aria-hidden="true" className="mr-3 size-5 text-gray-400" />
+          <ArrowLongLeftIcon
+            aria-hidden="true"
+            className="mr-3 size-5 text-gray-400"
+          />
           Previous
         </button>
       </div>
-      <div className="hidden md:-mt-px md:flex">
-        {pages}
-      </div>
+      <div className="hidden md:-mt-px md:flex">{pages}</div>
       <div className="-mt-px flex w-0 flex-1 justify-end">
         <button
           onClick={onNext}
           disabled={!hasNext}
           className={`inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium ${
-            !hasNext 
-              ? 'text-gray-300 cursor-not-allowed' 
-              : 'text-gray-500 hover:border-gray-300 hover:text-gray-700'
+            !hasNext
+              ? "cursor-not-allowed text-gray-300"
+              : "text-gray-500 hover:border-gray-300 hover:text-gray-700"
           }`}
         >
           Next
-          <ArrowLongRightIcon aria-hidden="true" className="ml-3 size-5 text-gray-400" />
+          <ArrowLongRightIcon
+            aria-hidden="true"
+            className="ml-3 size-5 text-gray-400"
+          />
         </button>
       </div>
     </nav>
   );
-} 
+}

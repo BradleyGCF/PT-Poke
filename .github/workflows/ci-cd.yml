@@ -28,3 +28,18 @@ jobs:
       - name: Build
         run: npm run build
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.ORG_ID }}
+          vercel-project-id: ${{ secrets.PROJECT_ID }}
+          vercel-args: '--prod'
+

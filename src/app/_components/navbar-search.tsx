@@ -1,7 +1,7 @@
 "use client";
 
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
-import { useSearch } from '~/contexts/search-context';
+import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
+import { useSearch } from "~/contexts/search-context";
 
 export function NavbarSearch() {
   const { searchTerm, setSearchTerm } = useSearch();
@@ -24,4 +24,4 @@ export function NavbarSearch() {
       </div>
     </div>
   );
-} 
+}

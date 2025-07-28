@@ -4,7 +4,7 @@ import { PokemonList } from "../_components";
 
 export default async function CollectionPage() {
   const session = await auth();
-  
+
   if (!session) {
     redirect("/");
   }
@@ -25,4 +25,4 @@ export default async function CollectionPage() {
       <PokemonList initialLimit={20} />
     </div>
   );
-} 
+}

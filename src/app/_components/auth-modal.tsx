@@ -15,48 +15,48 @@ interface AuthModalProps {
 export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [isLogin, setIsLogin] = useState(true);
   const router = useRouter();
-  const { update } = useSession(); 
+  const { update } = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    name: ''
+    email: "",
+    password: "",
+    confirmPassword: "",
+    name: "",
   });
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleGoogleAuth = async () => {
     try {
       setIsLoading(true);
-      setError('');
-      await signIn("google", { 
+      setError("");
+      await signIn("google", {
         callbackUrl: "/collection",
         // Force account selection to allow registration with another account
-        prompt: "select_account"
+        prompt: "select_account",
       });
     } catch (error) {
       console.error("Error signing in:", error);
-      setError('Error connecting with Google');
+      setError("Error connecting with Google");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
   };
 
   const handleLocalAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     try {
       if (isLogin) {
@@ -66,47 +66,51 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           redirect: false,
         });
         if (result?.error) {
-          setError('Invalid email or password');
+          setError("Invalid email or password");
         } else if (result?.ok) {
-          setSuccess('Login successful!');
+          setSuccess("Login successful!");
           await update();
           setTimeout(() => {
             onClose();
-            router.push('/collection');
+            router.push("/collection");
           }, 1000);
         }
       } else {
         if (formData.password !== formData.confirmPassword) {
-          setError('Passwords do not match');
+          setError("Passwords do not match");
           return;
         }
 
         if (formData.password.length < 6) {
-          setError('Password must be at least 6 characters long');
+          setError("Password must be at least 6 characters long");
           return;
         }
 
-        const response = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             email: formData.email,
             password: formData.password,
             name: formData.name ?? null,
           }),
         });
-        const data = (await response.json()) as { error?: string }; 
+        const data = (await response.json()) as { error?: string };
         if (response.ok) {
-          setSuccess('Account created successfully! Please sign in.');
+          setSuccess("Account created successfully! Please sign in.");
           setIsLogin(true);
-          setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
+          setFormData((prev) => ({
+            ...prev,
+            password: "",
+            confirmPassword: "",
+          }));
         } else {
-          setError(data?.error ?? 'Registration failed'); 
+          setError(data?.error ?? "Registration failed");
         }
       }
     } catch (error) {
-      console.error('Auth error:', error);
-      setError('An unexpected error occurred');
+      console.error("Auth error:", error);
+      setError("An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -124,15 +128,15 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <div className="flex justify-end">
             <button
               onClick={onClose}
-              className="rounded-md p-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="rounded-md p-2 text-gray-400 hover:text-gray-600 focus:ring-2 focus:ring-red-500 focus:outline-none"
             >
               <XMarkIcon className="h-6 w-6" />
             </button>
           </div>
 
           {/* Logo and title */}
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
+          <div className="mb-8 text-center">
+            <div className="mb-4 flex justify-center">
               <SafeImage
                 alt="Pokemon"
                 src="/logo.png"
@@ -145,10 +149,9 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
               {isLogin ? "Sign In" : "Create Account"}
             </DialogTitle>
             <p className="mt-2 text-sm text-gray-600">
-              {isLogin 
-                ? "Access your Pokemon collection" 
-                : "Join and start your Pokemon adventure"
-              }
+              {isLogin
+                ? "Access your Pokemon collection"
+                : "Join and start your Pokemon adventure"}
             </p>
           </div>
 
@@ -156,7 +159,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <button
             onClick={handleGoogleAuth}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isLoading ? (
               <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600"></div>
@@ -180,16 +183,18 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 />
               </svg>
             )}
-            {isLoading ? "Connecting..." : 
-             isLogin ? "Continue with Google" : "Sign up with Google"}
+            {isLoading
+              ? "Connecting..."
+              : isLogin
+                ? "Continue with Google"
+                : "Sign up with Google"}
           </button>
 
           {/* Info text about Google OAuth */}
-          <p className="mt-3 text-xs text-center text-gray-500">
-            {isLogin ? 
-              "If you don't have an account, it will be created automatically" :
-              "If you already have an account, it will sign in automatically"
-            }
+          <p className="mt-3 text-center text-xs text-gray-500">
+            {isLogin
+              ? "If you don't have an account, it will be created automatically"
+              : "If you already have an account, it will sign in automatically"}
           </p>
 
           {/* Divider */}
@@ -206,13 +211,13 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
           {/* Error/Success Messages */}
           {error && (
-            <div className="mb-4 p-3 rounded-md bg-red-50 border border-red-200">
+            <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-3">
               <p className="text-sm text-red-600">{error}</p>
             </div>
           )}
-          
+
           {success && (
-            <div className="mb-4 p-3 rounded-md bg-green-50 border border-green-200">
+            <div className="mb-4 rounded-md border border-green-200 bg-green-50 p-3">
               <p className="text-sm text-green-600">{success}</p>
             </div>
           )}
@@ -221,7 +226,10 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <form onSubmit={handleLocalAuth} className="space-y-4">
             {!isLogin && (
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Name (optional)
                 </label>
                 <input
@@ -230,14 +238,17 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-red-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:ring-red-500 focus:outline-none sm:text-sm"
                   placeholder="Your name"
                 />
               </div>
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Email address
               </label>
               <input
@@ -247,13 +258,16 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 value={formData.email}
                 onChange={handleInputChange}
                 required
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-red-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:ring-red-500 focus:outline-none sm:text-sm"
                 placeholder="you@email.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Password
               </label>
               <input
@@ -263,14 +277,17 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 value={formData.password}
                 onChange={handleInputChange}
                 required
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-red-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:ring-red-500 focus:outline-none sm:text-sm"
                 placeholder="••••••••"
               />
             </div>
 
             {!isLogin && (
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Confirm password
                 </label>
                 <input
@@ -280,7 +297,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
                   required
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-red-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:ring-red-500 focus:outline-none sm:text-sm"
                   placeholder="••••••••"
                 />
               </div>
@@ -289,15 +306,17 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white shadow hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-red-600 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center gap-2">
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
                   {isLogin ? "Signing In..." : "Creating Account..."}
                 </div>
+              ) : isLogin ? (
+                "Sign In"
               ) : (
-                isLogin ? "Sign In" : "Create Account"
+                "Create Account"
               )}
             </button>
           </form>
@@ -306,12 +325,11 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <div className="mt-6 text-center">
             <button
               onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-red-600 hover:text-red-500 font-medium"
+              className="text-sm font-medium text-red-600 hover:text-red-500"
             >
-              {isLogin 
-                ? "Don't have an account? Sign up" 
-                : "Already have an account? Sign in"
-              }
+              {isLogin
+                ? "Don't have an account? Sign up"
+                : "Already have an account? Sign in"}
             </button>
           </div>
         </DialogPanel>

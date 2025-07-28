@@ -22,11 +22,13 @@ export const PokemonSchema = z.object({
   sprites: z.object({
     front_default: z.string().nullable(),
     front_shiny: z.string().nullable(),
-    other: z.object({
-      "official-artwork": z.object({
-        front_default: z.string().nullable(),
-      }),
-    }).optional(),
+    other: z
+      .object({
+        "official-artwork": z.object({
+          front_default: z.string().nullable(),
+        }),
+      })
+      .optional(),
   }),
   types: z.array(
     z.object({
@@ -34,7 +36,7 @@ export const PokemonSchema = z.object({
         name: z.string(),
         url: z.string(),
       }),
-    })
+    }),
   ),
   stats: z.array(
     z.object({
@@ -42,7 +44,7 @@ export const PokemonSchema = z.object({
       stat: z.object({
         name: z.string(),
       }),
-    })
+    }),
   ),
   abilities: z.array(
     z.object({
@@ -51,7 +53,7 @@ export const PokemonSchema = z.object({
         url: z.string(),
       }),
       is_hidden: z.boolean(),
-    })
+    }),
   ),
 });
 
@@ -104,13 +106,13 @@ export const PokemonDetailedSchema = z.object({
     z.object({
       name: z.string(),
       base_stat: z.number(),
-    })
+    }),
   ),
   abilities: z.array(
     z.object({
       name: z.string(),
       is_hidden: z.boolean(),
-    })
+    }),
   ),
   evolutions: z.array(EvolutionItemSchema),
 });
@@ -119,6 +121,8 @@ export type Pokemon = z.infer<typeof PokemonSchema>;
 export type PokemonSpecies = z.infer<typeof PokemonSpeciesSchema>;
 export type PokemonListItem = z.infer<typeof PokemonListItemSchema>;
 export type PokemonListResponse = z.infer<typeof PokemonListResponseSchema>;
-export type PokemonListItemWithDetails = z.infer<typeof PokemonListItemWithDetailsSchema>;
+export type PokemonListItemWithDetails = z.infer<
+  typeof PokemonListItemWithDetailsSchema
+>;
 export type EvolutionItem = z.infer<typeof EvolutionItemSchema>;
-export type PokemonDetailed = z.infer<typeof PokemonDetailedSchema>; 
+export type PokemonDetailed = z.infer<typeof PokemonDetailedSchema>;

@@ -22,8 +22,8 @@ const handler = (req: NextRequest) =>
     router: appRouter,
     createContext: () => createContext(req),
     onError: ({ path, error }) => {
-      logger.error('tRPC API error', {
-        path: path ?? '<no-path>',
+      logger.error("tRPC API error", {
+        path: path ?? "<no-path>",
         error: error.message,
         stack: error.stack,
       });

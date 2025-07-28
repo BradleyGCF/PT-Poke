@@ -1,43 +1,47 @@
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
-import * as bcrypt from 'bcryptjs';
-import { db } from '~/server/db';
-import { generatePlaceholderAvatar } from '~/utils/avatar';
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import * as bcrypt from "bcryptjs";
+import { db } from "~/server/db";
+import { generatePlaceholderAvatar } from "~/utils/avatar";
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, name } = await request.json() as { email: string; password: string; name?: string };
+    const { email, password, name } = (await request.json()) as {
+      email: string;
+      password: string;
+      name?: string;
+    };
 
     if (!email || !password) {
       return NextResponse.json(
-        { error: 'Email and password are required' },
-        { status: 400 }
+        { error: "Email and password are required" },
+        { status: 400 },
       );
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
-        { error: 'Invalid email format' },
-        { status: 400 }
+        { error: "Invalid email format" },
+        { status: 400 },
       );
     }
 
     if (password.length < 6) {
       return NextResponse.json(
-        { error: 'Password must be at least 6 characters long' },
-        { status: 400 }
+        { error: "Password must be at least 6 characters long" },
+        { status: 400 },
       );
     }
 
     const existingUser = await db.user.findUnique({
-      where: { email }
+      where: { email },
     });
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'User already exists with this email' },
-        { status: 409 }
+        { error: "User already exists with this email" },
+        { status: 409 },
       );
     }
 
@@ -57,22 +61,21 @@ export async function POST(request: NextRequest) {
         name: true,
         image: true,
         createdAt: true,
-      }
+      },
     });
 
     return NextResponse.json(
-      { 
-        message: 'User created successfully',
-        user 
+      {
+        message: "User created successfully",
+        user,
       },
-      { status: 201 }
+      { status: 201 },
     );
-
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error("Registration error:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }

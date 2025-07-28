@@ -13,14 +13,14 @@ interface SafeImageProps {
   fallbackSrc?: string;
 }
 
-export function SafeImage({ 
-  src, 
-  alt, 
-  width, 
-  height, 
-  className, 
+export function SafeImage({
+  src,
+  alt,
+  width,
+  height,
+  className,
   priority = false,
-  fallbackSrc = "/favicon.ico"
+  fallbackSrc = "/favicon.ico",
 }: SafeImageProps) {
   const [imgSrc, setImgSrc] = useState(src);
   const [hasError, setHasError] = useState(false);
@@ -44,4 +44,4 @@ export function SafeImage({
       unoptimized={hasError} // Don't optimize fallback images
     />
   );
-} 
+}

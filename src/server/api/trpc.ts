@@ -46,7 +46,7 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
 
   const end = Date.now();
   const duration = end - start;
-  logger.debug('tRPC procedure executed', { path, duration });
+  logger.debug("tRPC procedure executed", { path, duration });
 
   return result;
 });

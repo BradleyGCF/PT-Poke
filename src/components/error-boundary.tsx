@@ -48,26 +48,27 @@ export class ErrorBoundary extends Component<Props, State> {
 
       // Default fallback UI
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center">
-            <div className="text-6xl mb-4">🚨</div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+        <div className="flex min-h-screen items-center justify-center bg-gray-50">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 text-center shadow-lg">
+            <div className="mb-4 text-6xl">🚨</div>
+            <h1 className="mb-2 text-2xl font-bold text-gray-900">
               Oops! Something went wrong
             </h1>
-            <p className="text-gray-600 mb-6">
-              We encountered an unexpected error. Don&apos;t worry, our team has been notified.
+            <p className="mb-6 text-gray-600">
+              We encountered an unexpected error. Don&apos;t worry, our team has
+              been notified.
             </p>
-            
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+
+            {process.env.NODE_ENV === "development" && this.state.error && (
               <details className="mb-6 text-left">
-                <summary className="cursor-pointer text-sm text-gray-500 mb-2">
+                <summary className="mb-2 cursor-pointer text-sm text-gray-500">
                   Error Details (Development Only)
                 </summary>
-                <pre className="text-xs bg-gray-100 p-3 rounded text-red-600 overflow-auto">
+                <pre className="overflow-auto rounded bg-gray-100 p-3 text-xs text-red-600">
                   {this.state.error.message}
                   {this.state.error.stack && (
                     <>
-                      {'\n\nStack Trace:\n'}
+                      {"\n\nStack Trace:\n"}
                       {this.state.error.stack}
                     </>
                   )}
@@ -75,14 +76,11 @@ export class ErrorBoundary extends Component<Props, State> {
               </details>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button 
-                onClick={this.handleRetry}
-                variant="primary"
-              >
+            <div className="flex flex-col justify-center gap-3 sm:flex-row">
+              <Button onClick={this.handleRetry} variant="primary">
                 Try Again
               </Button>
-              <Button 
+              <Button
                 onClick={() => window.location.reload()}
                 variant="secondary"
               >
@@ -96,4 +94,4 @@ export class ErrorBoundary extends Component<Props, State> {
 
     return this.props.children;
   }
-} 
+}

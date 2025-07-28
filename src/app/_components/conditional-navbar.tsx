@@ -2,8 +2,16 @@
 
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
-import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import {
+  Disclosure,
+  DisclosureButton,
+  DisclosurePanel,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+} from "@headlessui/react";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { SafeImage } from "~/components";
 import { NavbarSearch } from "./navbar-search";
 import { classNames, getUserAvatar } from "~/utils";
@@ -11,22 +19,25 @@ import Link from "next/link";
 
 const navigation: { name: string; href: string; current: boolean }[] = [
   // { name: 'Pokemon', href: '/', current: true },
-]
+];
 
 export function ConditionalNavbar() {
   const { data: session } = useSession();
-  
-  const user = session?.user ? {
-    name: session.user.name ?? 'User',
-    email: session.user.email ?? '',
-    imageUrl: getUserAvatar(session.user),
-  } : null;
+
+  const user = session?.user
+    ? {
+        name: session.user.name ?? "User",
+        email: session.user.email ?? "",
+        imageUrl: getUserAvatar(session.user),
+      }
+    : null;
   const pathname = usePathname();
-  
+
   // Hide navbar on Pokemon detail pages and landing page
-  const isPokemonDetailPage = pathname?.startsWith('/pokemon/') && pathname !== '/pokemon';
-  const isLandingPage = pathname === '/';
-  
+  const isPokemonDetailPage =
+    pathname?.startsWith("/pokemon/") && pathname !== "/pokemon";
+  const isLandingPage = pathname === "/";
+
   if (isPokemonDetailPage || isLandingPage) {
     return null;
   }
@@ -49,10 +60,12 @@ export function ConditionalNavbar() {
                 className="h-8 w-8"
                 priority
               />
-              <span className="ml-2 text-xl font-bold text-gray-900">Pokemon</span>
+              <span className="ml-2 text-xl font-bold text-gray-900">
+                Pokemon
+              </span>
             </div>
           </div>
-          
+
           <NavbarSearch />
 
           <div className="relative z-10 flex items-center lg:hidden">
@@ -60,24 +73,29 @@ export function ConditionalNavbar() {
             <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-600 hover:bg-gray-100 hover:text-gray-700 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden focus:ring-inset">
               <span className="absolute -inset-0.5" />
               <span className="sr-only">Open menu</span>
-              <Bars3Icon aria-hidden="true" className="block size-6 group-data-open:hidden" />
-              <XMarkIcon aria-hidden="true" className="hidden size-6 group-data-open:block" />
+              <Bars3Icon
+                aria-hidden="true"
+                className="block size-6 group-data-open:hidden"
+              />
+              <XMarkIcon
+                aria-hidden="true"
+                className="hidden size-6 group-data-open:block"
+              />
             </DisclosureButton>
           </div>
           <div className="hidden lg:relative lg:z-10 lg:ml-4 lg:flex lg:items-center">
-
             {/* User menu dropdown */}
             {session && user ? (
               <Menu as="div" className="relative ml-4 shrink-0">
                 <MenuButton className="relative flex rounded-full bg-white focus:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2">
                   <span className="absolute -inset-1.5" />
                   <span className="sr-only">Open user menu</span>
-                  <SafeImage 
-                    alt={`${user.name} avatar`} 
-                    src={user.imageUrl} 
+                  <SafeImage
+                    alt={`${user.name} avatar`}
+                    src={user.imageUrl}
                     width={32}
                     height={32}
-                    className="size-8 rounded-full" 
+                    className="size-8 rounded-full"
                   />
                 </MenuButton>
 
@@ -88,32 +106,37 @@ export function ConditionalNavbar() {
                   <MenuItem>
                     <button
                       onClick={handleSignOut}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+                      className="block w-full px-4 py-2 text-left text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
                     >
                       Sign out
                     </button>
                   </MenuItem>
                 </MenuItems>
               </Menu>
-                         ) : (
-               <Link
-                 href="/api/auth/signin"
-                 className="ml-4 rounded-md bg-red-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400"
-               >
-                 Sign in
-               </Link>
-             )}
+            ) : (
+              <Link
+                href="/api/auth/signin"
+                className="ml-4 rounded-md bg-red-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400"
+              >
+                Sign in
+              </Link>
+            )}
           </div>
         </div>
-        <nav aria-label="Global" className="hidden lg:flex lg:space-x-8 lg:py-2">
+        <nav
+          aria-label="Global"
+          className="hidden lg:flex lg:space-x-8 lg:py-2"
+        >
           {navigation.map((item) => (
             <a
               key={item.name}
               href={item.href}
-              aria-current={item.current ? 'page' : undefined}
+              aria-current={item.current ? "page" : undefined}
               className={classNames(
-                item.current ? 'bg-gray-100 text-gray-900' : 'text-gray-900 hover:bg-gray-50 hover:text-gray-900',
-                'inline-flex items-center rounded-md px-3 py-2 text-sm font-medium',
+                item.current
+                  ? "bg-gray-100 text-gray-900"
+                  : "text-gray-900 hover:bg-gray-50 hover:text-gray-900",
+                "inline-flex items-center rounded-md px-3 py-2 text-sm font-medium",
               )}
             >
               {item.name}
@@ -129,10 +152,12 @@ export function ConditionalNavbar() {
               key={item.name}
               as="a"
               href={item.href}
-              aria-current={item.current ? 'page' : undefined}
+              aria-current={item.current ? "page" : undefined}
               className={classNames(
-                item.current ? 'bg-gray-100 text-gray-900' : 'text-gray-900 hover:bg-gray-50 hover:text-gray-900',
-                'block rounded-md px-3 py-2 text-base font-medium',
+                item.current
+                  ? "bg-gray-100 text-gray-900"
+                  : "text-gray-900 hover:bg-gray-50 hover:text-gray-900",
+                "block rounded-md px-3 py-2 text-base font-medium",
               )}
             >
               {item.name}
@@ -143,25 +168,28 @@ export function ConditionalNavbar() {
           <div className="border-t border-gray-200 pt-4 pb-3">
             <div className="flex items-center px-4">
               <div className="shrink-0">
-                <SafeImage 
-                  alt={`${user.name} avatar`} 
-                  src={user.imageUrl} 
+                <SafeImage
+                  alt={`${user.name} avatar`}
+                  src={user.imageUrl}
                   width={40}
                   height={40}
-                  className="size-10 rounded-full" 
+                  className="size-10 rounded-full"
                 />
               </div>
               <div className="ml-3">
-                <div className="text-base font-medium text-gray-800">{user.name}</div>
-                <div className="text-sm font-medium text-gray-600">{user.email}</div>
+                <div className="text-base font-medium text-gray-800">
+                  {user.name}
+                </div>
+                <div className="text-sm font-medium text-gray-600">
+                  {user.email}
+                </div>
               </div>
-
             </div>
             <div className="mt-3 space-y-1 px-2">
               <DisclosureButton
                 as="button"
                 onClick={handleSignOut}
-                className="block w-full text-left rounded-md px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                className="block w-full rounded-md px-3 py-2 text-left text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               >
                 Sign out
               </DisclosureButton>

@@ -11,42 +11,44 @@ interface PokemonCardProps {
 
 export function PokemonCard({ pokemon }: PokemonCardProps) {
   return (
-    <Link href={`/pokemon/${pokemon.name}`} className="block group">
-      <Card className="transition-all duration-200 group-hover:shadow-lg group-hover:scale-105">
+    <Link href={`/pokemon/${pokemon.name}`} className="group block">
+      <Card className="transition-all duration-200 group-hover:scale-105 group-hover:shadow-lg">
         <div className="p-4">
           {/* Pokemon Image */}
-          <div className="flex justify-center mb-4">
-            <div className="w-24 h-24 relative">
+          <div className="mb-4 flex justify-center">
+            <div className="relative h-24 w-24">
               {pokemon.sprite ? (
                 <SafeImage
                   src={pokemon.sprite}
                   alt={pokemon.name}
                   width={96}
                   height={96}
-                  className="w-full h-full object-contain"
+                  className="h-full w-full object-contain"
                   fallbackSrc="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='32'%3E🔍%3C/text%3E%3C/svg%3E"
                 />
               ) : (
-                <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
-                  <span className="text-gray-400 text-sm">No Image</span>
+                <div className="flex h-full w-full items-center justify-center rounded-lg bg-gray-200">
+                  <span className="text-sm text-gray-400">No Image</span>
                 </div>
               )}
             </div>
           </div>
 
           {/* Pokemon ID */}
-          <div className="text-center mb-2">
-            <span className="text-xs text-gray-500 font-mono">#{pokemon.id.toString().padStart(3, '0')}</span>
+          <div className="mb-2 text-center">
+            <span className="font-mono text-xs text-gray-500">
+              #{pokemon.id.toString().padStart(3, "0")}
+            </span>
           </div>
 
           {/* Pokemon Name */}
-                      <h3 className="text-lg font-semibold text-center mb-3 capitalize group-hover:text-red-600 transition-colors">
+          <h3 className="mb-3 text-center text-lg font-semibold capitalize transition-colors group-hover:text-red-600">
             {pokemon.name}
           </h3>
 
           {/* Generation */}
-          <div className="text-center mb-3">
-            <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
+          <div className="mb-3 text-center">
+            <span className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-700">
               {pokemon.generation}
             </span>
           </div>
@@ -56,7 +58,7 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
             {pokemon.types.map((type) => (
               <span
                 key={type}
-                className={`text-xs text-white px-2 py-1 rounded-full capitalize ${getTypeColor(type)}`}
+                className={`rounded-full px-2 py-1 text-xs text-white capitalize ${getTypeColor(type)}`}
               >
                 {type}
               </span>
@@ -66,4 +68,4 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
       </Card>
     </Link>
   );
-} 
+}

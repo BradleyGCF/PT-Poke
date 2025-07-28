@@ -12,9 +12,9 @@ export default async function PokemonPage({ params }: PokemonPageProps) {
   try {
     const { nameOrId } = await params;
     const pokemon = await api.pokemon.getDetailedByNameOrId(nameOrId);
-    
+
     return (
-      <div className="max-w-7xl mx-auto">
+      <div className="mx-auto max-w-7xl">
         <PokemonDetails pokemon={pokemon} />
       </div>
     );
@@ -39,4 +39,4 @@ export async function generateMetadata({ params }: PokemonPageProps) {
       description: "Pokemon application.",
     };
   }
-} 
+}

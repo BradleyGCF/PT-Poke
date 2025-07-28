@@ -13,7 +13,7 @@ export default function LandingPage() {
 
   const handleGetStarted = () => {
     if (session) {
-            router.push("/collection");
+      router.push("/collection");
     } else {
       setIsAuthModalOpen(true);
     }
@@ -24,29 +24,30 @@ export default function LandingPage() {
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="mx-auto max-w-7xl">
-          <div className="relative z-10 pb-8 bg-transparent sm:pb-16 md:pb-20 lg:w-full lg:max-w-2xl lg:pb-28 xl:pb-32">
+          <div className="relative z-10 bg-transparent pb-8 sm:pb-16 md:pb-20 lg:w-full lg:max-w-2xl lg:pb-28 xl:pb-32">
             <main className="mx-auto mt-10 max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
               <div className="sm:text-center lg:text-left">
-                                  <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
-                    <span className="block xl:inline">Discover </span>
-                    <span className="block text-red-600 font-bold xl:inline">your Pokemon</span>
-                    <span className="block xl:inline"> adventure</span>
-                  </h1>
-                <p className="mt-3 text-base text-gray-600 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                Catch them all like never before — browse, track, and complete your Pokédex with every Pokémon ever created.
+                <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
+                  <span className="block xl:inline">Discover </span>
+                  <span className="block font-bold text-red-600 xl:inline">
+                    your Pokemon
+                  </span>
+                  <span className="block xl:inline"> adventure</span>
+                </h1>
+                <p className="mt-3 text-base text-gray-600 sm:mx-auto sm:mt-5 sm:max-w-xl sm:text-lg md:mt-5 md:text-xl lg:mx-0">
+                  Catch them all like never before — browse, track, and complete
+                  your Pokédex with every Pokémon ever created.
                 </p>
 
                 <div className="mt-8 sm:mt-10 sm:flex sm:justify-center lg:justify-start">
                   <button
                     onClick={handleGetStarted}
-                    className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-500 hover:bg-red-600 md:py-4 md:text-lg md:px-10 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-transform"
+                    className="flex w-full transform items-center justify-center rounded-md border border-transparent bg-red-500 px-8 py-3 text-base font-medium text-white shadow-lg transition-colors transition-transform duration-200 hover:-translate-y-0.5 hover:bg-red-600 hover:shadow-xl md:px-10 md:py-4 md:text-lg"
                   >
                     {session ? "View My Collection" : "Start Adventure"}
                     <span className="ml-2">→</span>
                   </button>
                 </div>
-
-
               </div>
             </main>
           </div>
@@ -54,7 +55,7 @@ export default function LandingPage() {
 
         {/* Pokemon Images */}
         <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
-          <div className="h-56 w-full sm:h-72 md:h-96 lg:w-full lg:h-full flex items-center justify-center">
+          <div className="flex h-56 w-full items-center justify-center sm:h-72 md:h-96 lg:h-full lg:w-full">
             <div className="relative">
               {/* Main Pokemon */}
               <div className="relative z-10">
@@ -63,11 +64,11 @@ export default function LandingPage() {
                   alt="Entei"
                   width={300}
                   height={300}
-                  className="w-64 h-64 sm:w-80 sm:h-80 object-contain"
+                  className="h-64 w-64 object-contain sm:h-80 sm:w-80"
                   priority
                 />
               </div>
-              
+
               {/* Secondary Pokemon */}
               <div className="absolute -top-4 -left-8 opacity-60">
                 <SafeImage
@@ -75,27 +76,27 @@ export default function LandingPage() {
                   alt="Flareon"
                   width={120}
                   height={120}
-                  className="w-20 h-20 sm:w-24 sm:h-24 object-contain"
+                  className="h-20 w-20 object-contain sm:h-24 sm:w-24"
                 />
               </div>
-              
-              <div className="absolute -bottom-6 -right-6 opacity-60">
+
+              <div className="absolute -right-6 -bottom-6 opacity-60">
                 <SafeImage
                   src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/467.png"
                   alt="Magmortar"
                   width={120}
                   height={120}
-                  className="w-20 h-20 sm:w-24 sm:h-24 object-contain"
+                  className="h-20 w-20 object-contain sm:h-24 sm:w-24"
                 />
               </div>
-              
+
               <div className="absolute top-16 -right-12 opacity-40">
                 <SafeImage
                   src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/157.png"
                   alt="Typhlosion"
                   width={100}
                   height={100}
-                  className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
+                  className="h-16 w-16 object-contain sm:h-20 sm:w-20"
                 />
               </div>
             </div>
@@ -104,9 +105,9 @@ export default function LandingPage() {
       </div>
 
       {/* Auth Modal */}
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
       />
     </div>
   );

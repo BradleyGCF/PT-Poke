@@ -36,7 +36,7 @@ export const authConfig = {
       name: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -54,18 +54,15 @@ export const authConfig = {
               email: true,
               name: true,
               image: true,
-              password: true
-            }
+              password: true,
+            },
           });
 
           if (!user?.password) {
             return null;
           }
 
-          const isValidPassword = await bcrypt.compare(
-            password,
-            user.password
-          );
+          const isValidPassword = await bcrypt.compare(password, user.password);
 
           if (!isValidPassword) {
             return null;
@@ -81,7 +78,7 @@ export const authConfig = {
           console.error("Auth error:", error);
           return null;
         }
-      }
+      },
     }),
   ],
   adapter: PrismaAdapter(db),
@@ -99,21 +96,21 @@ export const authConfig = {
       ...session,
       user: {
         ...session.user,
-        id: typeof token?.id === 'string' ? token.id : '',
+        id: typeof token?.id === "string" ? token.id : "",
       },
     }),
     redirect: async ({ url, baseUrl }) => {
       // Allows relative callback URLs
-      if (url.startsWith("/")) return `${baseUrl}${url}`
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
       // Allows callback URLs on the same origin
-      else if (new URL(url).origin === baseUrl) return url
-      return baseUrl
+      else if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
     },
   },
   pages: {
-    signIn: '/',
-    error: '/',
-    signOut: '/', // Redirect to landing page after signout
+    signIn: "/",
+    error: "/",
+    signOut: "/", // Redirect to landing page after signout
   },
   events: {
     async signOut() {

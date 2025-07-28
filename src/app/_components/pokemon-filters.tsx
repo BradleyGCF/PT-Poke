@@ -1,7 +1,11 @@
 "use client";
 
 import { Select } from "~/components";
-import { TYPE_OPTIONS, GENERATION_OPTIONS, PER_PAGE_OPTIONS } from "~/constants/pokemon";
+import {
+  TYPE_OPTIONS,
+  GENERATION_OPTIONS,
+  PER_PAGE_OPTIONS,
+} from "~/constants/pokemon";
 
 interface FilterState {
   typeFilter: string;
@@ -31,13 +35,13 @@ export function PokemonFilters({
   const hasActiveFilters = filters.typeFilter || filters.generationFilter;
 
   return (
-    <div className="space-y-4 rounded-xl bg-white/70 backdrop-blur-sm border border-gray-200/50 p-5 shadow-sm">
+    <div className="space-y-4 rounded-xl border border-gray-200/50 bg-white/70 p-5 shadow-sm backdrop-blur-sm">
       {/* Clear Filters Button */}
       {hasActiveFilters && (
         <div className="flex justify-end">
           <button
             onClick={onClearFilters}
-            className="text-sm text-red-600 hover:text-red-500 font-medium transition-colors duration-200"
+            className="text-sm font-medium text-red-600 transition-colors duration-200 hover:text-red-500"
           >
             Clear Filters
           </button>
@@ -52,7 +56,11 @@ export function PokemonFilters({
           <Select
             label="Type:"
             options={TYPE_OPTIONS}
-            value={TYPE_OPTIONS.find(option => option.value === filters.typeFilter) ?? TYPE_OPTIONS[0]}
+            value={
+              TYPE_OPTIONS.find(
+                (option) => option.value === filters.typeFilter,
+              ) ?? TYPE_OPTIONS[0]
+            }
             onChange={(selected) => onTypeChange(selected.value as string)}
             minWidth="150px"
           />
@@ -61,8 +69,14 @@ export function PokemonFilters({
           <Select
             label="Generation:"
             options={GENERATION_OPTIONS}
-            value={GENERATION_OPTIONS.find(option => option.value === filters.generationFilter) ?? GENERATION_OPTIONS[0]}
-            onChange={(selected) => onGenerationChange(selected.value as string)}
+            value={
+              GENERATION_OPTIONS.find(
+                (option) => option.value === filters.generationFilter,
+              ) ?? GENERATION_OPTIONS[0]
+            }
+            onChange={(selected) =>
+              onGenerationChange(selected.value as string)
+            }
             minWidth="180px"
           />
 
@@ -70,14 +84,18 @@ export function PokemonFilters({
           <Select
             label="Show:"
             options={PER_PAGE_OPTIONS}
-            value={PER_PAGE_OPTIONS.find(option => option.value === filters.limit) ?? PER_PAGE_OPTIONS[1]}
+            value={
+              PER_PAGE_OPTIONS.find(
+                (option) => option.value === filters.limit,
+              ) ?? PER_PAGE_OPTIONS[1]
+            }
             onChange={(selected) => onLimitChange(selected.value as number)}
             minWidth="120px"
           />
         </div>
 
         {/* Results Count on the right */}
-        <div className="text-sm text-gray-600 whitespace-nowrap">
+        <div className="text-sm whitespace-nowrap text-gray-600">
           {totalCount !== undefined ? (
             `Showing ${offset + 1}-${Math.min(offset + filters.limit, totalCount)} of ${totalCount.toLocaleString()} Pokemon`
           ) : (
@@ -90,11 +108,12 @@ export function PokemonFilters({
       {hasActiveFilters && (
         <div className="flex flex-wrap gap-2">
           {filters.typeFilter && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-800">
-              Type: {TYPE_OPTIONS.find(t => t.value === filters.typeFilter)?.name}
+            <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-800">
+              Type:{" "}
+              {TYPE_OPTIONS.find((t) => t.value === filters.typeFilter)?.name}
               <button
-                onClick={() => onTypeChange('')}
-                                  className="ml-1 text-red-600 hover:text-red-500"
+                onClick={() => onTypeChange("")}
+                className="ml-1 text-red-600 hover:text-red-500"
               >
                 ×
               </button>
@@ -102,9 +121,13 @@ export function PokemonFilters({
           )}
           {filters.generationFilter && (
             <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
-              {GENERATION_OPTIONS.find(g => g.value === filters.generationFilter)?.name}
+              {
+                GENERATION_OPTIONS.find(
+                  (g) => g.value === filters.generationFilter,
+                )?.name
+              }
               <button
-                onClick={() => onGenerationChange('')}
+                onClick={() => onGenerationChange("")}
                 className="ml-1 text-blue-600 hover:text-blue-500"
               >
                 ×

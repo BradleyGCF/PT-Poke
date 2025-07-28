@@ -1,4 +1,4 @@
-type LogLevel = 'info' | 'warn' | 'error' | 'debug';
+type LogLevel = "info" | "warn" | "error" | "debug";
 
 interface LogEntry {
   level: LogLevel;
@@ -8,10 +8,14 @@ interface LogEntry {
 }
 
 class Logger {
-  private isProduction = process.env.NODE_ENV === 'production';
-  private isDevelopment = process.env.NODE_ENV === 'development';
+  private isProduction = process.env.NODE_ENV === "production";
+  private isDevelopment = process.env.NODE_ENV === "development";
 
-  private formatLog(level: LogLevel, message: string, data?: unknown): LogEntry {
+  private formatLog(
+    level: LogLevel,
+    message: string,
+    data?: unknown,
+  ): LogEntry {
     return {
       level,
       message,
@@ -23,44 +27,44 @@ class Logger {
   private shouldLog(level: LogLevel): boolean {
     // In production, only log errors
     if (this.isProduction) {
-      return level === 'error';
+      return level === "error";
     }
     // In development, log everything
     return true;
   }
 
   info(message: string, data?: unknown): void {
-    if (!this.shouldLog('info')) return;
-    
+    if (!this.shouldLog("info")) return;
+
     if (this.isDevelopment) {
-      console.log(`ℹ️ [INFO] ${message}`, data ?? '');
+      console.log(`ℹ️ [INFO] ${message}`, data ?? "");
     }
   }
 
   warn(message: string, data?: unknown): void {
-    if (!this.shouldLog('warn')) return;
-    
+    if (!this.shouldLog("warn")) return;
+
     if (this.isDevelopment) {
-      console.warn(`⚠️ [WARN] ${message}`, data ?? '');
+      console.warn(`⚠️ [WARN] ${message}`, data ?? "");
     }
   }
 
   error(message: string, data?: unknown): void {
-    if (!this.shouldLog('error')) return;
-    
+    if (!this.shouldLog("error")) return;
+
     if (this.isDevelopment) {
-      console.error(`🚨 [ERROR] ${message}`, data ?? '');
+      console.error(`🚨 [ERROR] ${message}`, data ?? "");
     } else {
-      const logEntry = this.formatLog('error', message, data);
+      const logEntry = this.formatLog("error", message, data);
       console.error(JSON.stringify(logEntry));
     }
   }
 
   debug(message: string, data?: unknown): void {
-    if (!this.shouldLog('debug')) return;
-    
+    if (!this.shouldLog("debug")) return;
+
     if (this.isDevelopment) {
-      console.debug(`🔍 [DEBUG] ${message}`, data ?? '');
+      console.debug(`🔍 [DEBUG] ${message}`, data ?? "");
     }
   }
 }

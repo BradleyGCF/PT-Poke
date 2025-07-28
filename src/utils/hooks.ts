@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 // Custom hook for debouncing values
 export function useDebounce<T>(value: T, delay: number): T {
@@ -17,4 +17,4 @@ export function useDebounce<T>(value: T, delay: number): T {
   }, [value, delay]);
 
   return debouncedValue;
-} 
+}

@@ -27,12 +27,15 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-
   return (
     <html lang="en" className={`${inter.variable} h-full`}>
-      <body className="h-full bg-white" style={{
-        background: 'radial-gradient(circle at 25% 50%, rgba(255, 140, 0, 0.12) 0%, rgba(255, 140, 0, 0.06) 35%, rgba(255, 255, 255, 1) 60%)'
-      }}>
+      <body
+        className="h-full bg-white"
+        style={{
+          background:
+            "radial-gradient(circle at 25% 50%, rgba(255, 140, 0, 0.12) 0%, rgba(255, 140, 0, 0.06) 35%, rgba(255, 255, 255, 1) 60%)",
+        }}
+      >
         <ErrorBoundary>
           <TRPCReactProvider>
             <SessionProvider>
