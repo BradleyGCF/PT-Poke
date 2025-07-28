@@ -95,13 +95,13 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             name: formData.name ?? null,
           }),
         });
-        const data: { error?: string } = await response.json(); // Tipado seguro
+        const data = (await response.json()) as { error?: string }; 
         if (response.ok) {
           setSuccess('Account created successfully! Please sign in.');
           setIsLogin(true);
           setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
         } else {
-          setError(data?.error ?? 'Registration failed'); // Uso nullish coalescing y acceso seguro
+          setError(data?.error ?? 'Registration failed'); 
         }
       }
     } catch (error) {

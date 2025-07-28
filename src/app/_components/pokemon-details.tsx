@@ -172,7 +172,7 @@ export function PokemonDetails({ pokemon }: PokemonDetailsProps) {
                   <div key={stat.name} className="space-y-1">
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium text-gray-700 capitalize">
-                        {statNames[stat.name] || stat.name}
+                        {statNames[stat.name] ?? stat.name}
                       </span>
                       <span className="text-sm font-bold text-gray-900">
                         {stat.base_stat}

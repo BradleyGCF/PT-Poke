@@ -216,7 +216,6 @@ export async function getListWithDetailsService(input: {
     const totalCount = isFiltered ? 
       Math.max(filteredPokemon.length, input.offset + paginatedResults.length + (paginatedResults.length === input.limit ? input.limit : 0)) :
       listData.count;
-    // Determine if there are more results
     const hasNext = isFiltered ? 
       (filteredPokemon.length > endIndex) || (paginatedResults.length === input.limit && filteredPokemon.length === batchSize) :
       !!listData.next;

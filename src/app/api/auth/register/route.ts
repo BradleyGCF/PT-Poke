@@ -6,7 +6,7 @@ import { generatePlaceholderAvatar } from '~/utils/avatar';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, name }: { email: string; password: string; name?: string } = await request.json();
+    const { email, password, name } = await request.json() as { email: string; password: string; name?: string };
 
     if (!email || !password) {
       return NextResponse.json(

@@ -32,6 +32,9 @@ export function PokemonList({ initialLimit = 20 }: PokemonListProps) {
     nameSearch: debouncedNameSearch || undefined,
   });
 
+  // Add a type guard for data
+  const safeData = (data && typeof data === 'object' && 'results' in data && Array.isArray(data.results)) ? data as { count: number; results: any[]; next?: string } : { count: 0, results: [] };
+
   if (error) {
     // Log the error for monitoring
     logger.error('Pokemon list error', { 
@@ -134,7 +137,7 @@ export function PokemonList({ initialLimit = 20 }: PokemonListProps) {
         onGenerationChange={handleGenerationFilterChange}
         onLimitChange={handleLimitChange}
         onClearFilters={clearFilters}
-        totalCount={data?.count}
+        totalCount={safeData.count}
         offset={offset}
       />
 
@@ -151,7 +154,7 @@ export function PokemonList({ initialLimit = 20 }: PokemonListProps) {
       {/* Pokemon Grid */}
       {data && (
         <>
-          {data.results.length === 0 ? (
+          {safeData.results.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-gray-500 mb-4">
                 <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -177,7 +180,7 @@ export function PokemonList({ initialLimit = 20 }: PokemonListProps) {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-              {data.results.map((pokemon) => (
+              {safeData.results.map((pokemon) => (
                 <ErrorBoundary 
                   key={pokemon.id}
                   fallback={
@@ -196,12 +199,12 @@ export function PokemonList({ initialLimit = 20 }: PokemonListProps) {
           )}
 
           {/* Pagination */}
-          {data.results.length > 0 && (
+          {safeData.results.length > 0 && (
             <PokemonPagination
               offset={offset}
               limit={limit}
-              totalCount={data.count}
-              hasNext={!!data.next}
+              totalCount={safeData.count}
+              hasNext={!!safeData.next}
               onPrevious={handlePreviousPage}
               onNext={handleNextPage}
               onPageClick={handlePageClick}

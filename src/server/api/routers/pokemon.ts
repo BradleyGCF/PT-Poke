@@ -34,7 +34,8 @@ export const pokemonRouter = createTRPCRouter({
       }
       
       const data = await response.json();
-      return PokemonListResponseSchema.parse(data);
+      const parsed = PokemonListResponseSchema.parse(data);
+      return parsed;
     }),
 
   getListWithDetails: publicProcedure
@@ -72,7 +73,8 @@ export const pokemonRouter = createTRPCRouter({
       }
       
       const data = await response.json();
-      return PokemonSchema.parse(data);
+      const parsed = PokemonSchema.parse(data);
+      return parsed;
     }),
 
   getDetailedByNameOrId: publicProcedure
