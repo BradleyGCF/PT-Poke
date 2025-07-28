@@ -60,4 +60,4 @@ npm run start
 ## Notas
 
 - Asegúrate de que tu base de datos esté ejecutándose antes de iniciar la aplicación
-- Si encuentras problemas con la base de datos, puedes usar `npm run db:reset` para reiniciar las migraciones (esto eliminará todos los datos)
+- Si encuentras problemas con la base de datos, puedes usar `npm run db:reset` para reiniciar las migraciones.
