@@ -44,21 +44,9 @@ npm run dev
 
 La aplicación estará disponible en [http://localhost:3000](http://localhost:3000)
 
-### Modo Producción
-```bash
-# Construir el proyecto
-npm run build
-
-# Iniciar el servidor
-npm run start
-```
-
 ## Scripts Adicionales
 
 - `npm run db:studio` - Abrir Prisma Studio para visualizar la base de datos
-- `npm run lint` - Ejecutar el linter
-- `npm run typecheck` - Verificar tipos de TypeScript
-- `npm run format:write` - Formatear el código
 
 ## Notas
 
