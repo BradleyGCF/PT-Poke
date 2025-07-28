@@ -1,4 +1,4 @@
-import { TRPCError, initTRPC } from "@trpc/server";
+import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
@@ -30,9 +30,8 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
   },
 });
 
-export const createCallerFactory = t.createCallerFactory;
-
 export const createTRPCRouter = t.router;
+export const createCallerFactory = t.createCallerFactory;
 
 const timingMiddleware = t.middleware(async ({ next, path }) => {
   const start = Date.now();
@@ -52,18 +51,3 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
 });
 
 export const publicProcedure = t.procedure.use(timingMiddleware);
-
-const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
-  }
-  return next({
-    ctx: {
-      session: { ...ctx.session, user: ctx.session.user },
-    },
-  });
-});
-
-export const protectedProcedure = t.procedure
-  .use(timingMiddleware)
-  .use(enforceUserIsAuthed);

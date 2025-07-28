@@ -6,3 +6,4 @@ export { PokemonFilters } from "./pokemon-filters";
 export { PokemonList } from "./pokemon-list";
 export { PokemonPagination } from "./pokemon-pagination";
 export { AuthModal } from "./auth-modal";
+export { SignInButton } from "./sign-in-button";

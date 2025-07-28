@@ -1,12 +1,7 @@
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  publicProcedure,
-  protectedProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import {
   PokemonSchema,
-  PokemonListResponseSchema,
   PokemonSpeciesSchema,
   PokemonDetailedSchema,
   type PokemonDetailed,
@@ -21,27 +16,6 @@ import {
 const POKEAPI_BASE_URL = "https://pokeapi.co/api/v2";
 
 export const pokemonRouter = createTRPCRouter({
-  getList: publicProcedure
-    .input(
-      z.object({
-        limit: z.number().min(1).max(100).default(20),
-        offset: z.number().min(0).default(0),
-      }),
-    )
-    .query(async ({ input }) => {
-      const response = await fetch(
-        `${POKEAPI_BASE_URL}/pokemon?limit=${input.limit}&offset=${input.offset}`,
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch Pokemon list");
-      }
-
-      const data: unknown = await response.json();
-      const parsed = PokemonListResponseSchema.parse(data);
-      return parsed;
-    }),
-
   getListWithDetails: publicProcedure
     .input(
       z.object({
@@ -66,23 +40,6 @@ export const pokemonRouter = createTRPCRouter({
         throw new Error("Failed to fetch Pokemon with details");
       }
     }),
-
-  getByNameOrId: publicProcedure.input(z.string()).query(async ({ input }) => {
-    const response = await fetch(
-      `${POKEAPI_BASE_URL}/pokemon/${input.toLowerCase()}`,
-    );
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error("Pokemon not found");
-      }
-      throw new Error("Failed to fetch Pokemon");
-    }
-
-    const data: unknown = await response.json();
-    const parsed = PokemonSchema.parse(data);
-    return parsed;
-  }),
 
   getDetailedByNameOrId: publicProcedure
     .input(z.string())
@@ -156,15 +113,5 @@ export const pokemonRouter = createTRPCRouter({
         });
         throw error;
       }
-    }),
-
-  someProtectedEndpoint: protectedProcedure
-    .input(
-      z.object({
-        /* ... */
-      }),
-    )
-    .mutation(async () => {
-      // Only authenticated users can reach this point
     }),
 });

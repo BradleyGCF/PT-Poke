@@ -14,12 +14,8 @@ import {
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { SafeImage } from "~/components";
 import { NavbarSearch } from "./navbar-search";
-import { classNames, getUserAvatar } from "~/utils";
-import Link from "next/link";
-
-const navigation: { name: string; href: string; current: boolean }[] = [
-  // { name: 'Pokemon', href: '/', current: true },
-];
+import { SignInButton } from "./sign-in-button";
+import { getUserAvatar } from "~/utils";
 
 export function ConditionalNavbar() {
   const { data: session } = useSession();
@@ -114,56 +110,13 @@ export function ConditionalNavbar() {
                 </MenuItems>
               </Menu>
             ) : (
-              <Link
-                href="/api/auth/signin"
-                className="ml-4 rounded-md bg-red-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400"
-              >
-                Sign in
-              </Link>
+              <SignInButton variant="desktop" />
             )}
           </div>
         </div>
-        <nav
-          aria-label="Global"
-          className="hidden lg:flex lg:space-x-8 lg:py-2"
-        >
-          {navigation.map((item) => (
-            <a
-              key={item.name}
-              href={item.href}
-              aria-current={item.current ? "page" : undefined}
-              className={classNames(
-                item.current
-                  ? "bg-gray-100 text-gray-900"
-                  : "text-gray-900 hover:bg-gray-50 hover:text-gray-900",
-                "inline-flex items-center rounded-md px-3 py-2 text-sm font-medium",
-              )}
-            >
-              {item.name}
-            </a>
-          ))}
-        </nav>
       </div>
 
       <DisclosurePanel as="nav" aria-label="Global" className="lg:hidden">
-        <div className="space-y-1 px-2 pt-2 pb-3">
-          {navigation.map((item) => (
-            <DisclosureButton
-              key={item.name}
-              as="a"
-              href={item.href}
-              aria-current={item.current ? "page" : undefined}
-              className={classNames(
-                item.current
-                  ? "bg-gray-100 text-gray-900"
-                  : "text-gray-900 hover:bg-gray-50 hover:text-gray-900",
-                "block rounded-md px-3 py-2 text-base font-medium",
-              )}
-            >
-              {item.name}
-            </DisclosureButton>
-          ))}
-        </div>
         {session && user && (
           <div className="border-t border-gray-200 pt-4 pb-3">
             <div className="flex items-center px-4">
@@ -199,12 +152,7 @@ export function ConditionalNavbar() {
         {!session && (
           <div className="border-t border-gray-200 pt-4 pb-3">
             <div className="px-2">
-              <Link
-                href="/api/auth/signin"
-                className="block rounded-md bg-red-400 px-3 py-2 text-base font-medium text-white shadow-sm hover:bg-red-500"
-              >
-                Sign in
-              </Link>
+              <SignInButton variant="mobile" />
             </div>
           </div>
         )}

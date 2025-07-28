@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import * as bcrypt from "bcryptjs";
 import { db } from "~/server/db";
 import { generatePlaceholderAvatar } from "~/utils/avatar";
+import { logger } from "~/utils";
 
 export async function POST(request: NextRequest) {
   try {
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
       { status: 201 },
     );
   } catch (error) {
-    console.error("Registration error:", error);
+    logger.error("Registration error", { error });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
