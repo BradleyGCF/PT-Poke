@@ -100,11 +100,15 @@ export const authConfig = {
       },
     }),
     redirect: async ({ url, baseUrl }) => {
-      // Allows relative callback URLs
+      // Handle relative callback URLs
       if (url.startsWith("/")) return `${baseUrl}${url}`;
-      // Allows callback URLs on the same origin
-      else if (new URL(url).origin === baseUrl) return url;
-      return baseUrl;
+
+      // Handle callback URLs on the same origin
+      if (new URL(url).origin === baseUrl) return url;
+
+      // For external URLs or invalid URLs, redirect to collection instead of homepage
+      // This ensures users are redirected to collection after successful Google auth
+      return `${baseUrl}/collection`;
     },
   },
   pages: {
