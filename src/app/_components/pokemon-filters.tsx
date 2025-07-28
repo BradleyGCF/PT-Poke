@@ -95,7 +95,7 @@ export function PokemonFilters({
         </div>
 
         {/* Results Count on the right */}
-        <div className="text-sm whitespace-nowrap text-gray-600">
+        <div className="hidden text-sm whitespace-nowrap text-gray-600 sm:block">
           {totalCount !== undefined ? (
             `Showing ${offset + 1}-${Math.min(offset + filters.limit, totalCount)} of ${totalCount.toLocaleString()} Pokemon`
           ) : (

@@ -1,30 +1,66 @@
 # PT-Poke
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+Una aplicación web de Pokédex construida con Next.js, tRPC, Prisma y NextAuth.
 
-## What's next? How do I make an app with this?
+## Requisitos Previos
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+- Node.js (versión 18 o superior)
+- npm
+- Base de datos compatible con Prisma (PostgreSQL, MySQL, SQLite, etc.)
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## Instalación
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+1. **Clonar el repositorio**
+   ```bash
+   git clone <url-del-repositorio>
+   cd PT-Poke
+   ```
 
-## Learn More
+2. **Instalar dependencias**
+   ```bash
+   npm install
+   ```
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+3. **Configurar variables de entorno**
+   - Crear un archivo `.env` en la raíz del proyecto
+   - Copiar el contenido del archivo de variables de entorno que se proporcionará
+   - Asegurarse de que todas las variables estén correctamente configuradas
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+4. **Configurar la base de datos**
+   ```bash
+   # Generar el cliente de Prisma
+   npm run db:generate
+   
+   # Ejecutar las migraciones
+   npm run db:migrate
+   ```
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+## Ejecutar el Proyecto
 
-## How do I deploy this?
+### Modo Desarrollo
+```bash
+npm run dev
+```
 
-probando cambios en cicd
+La aplicación estará disponible en [http://localhost:3000](http://localhost:3000)
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information. 
+### Modo Producción
+```bash
+# Construir el proyecto
+npm run build
+
+# Iniciar el servidor
+npm run start
+```
+
+## Scripts Adicionales
+
+- `npm run db:studio` - Abrir Prisma Studio para visualizar la base de datos
+- `npm run lint` - Ejecutar el linter
+- `npm run typecheck` - Verificar tipos de TypeScript
+- `npm run format:write` - Formatear el código
+
+## Notas
+
+- Asegúrate de que tu base de datos esté ejecutándose antes de iniciar la aplicación
+- Si encuentras problemas con la base de datos, puedes usar `npm run db:reset` para reiniciar las migraciones (esto eliminará todos los datos)
