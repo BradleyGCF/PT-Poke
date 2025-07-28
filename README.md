@@ -35,6 +35,11 @@ Una aplicación web de Pokédex construida con Next.js, tRPC, Prisma y NextAuth.
    npm run db:migrate
    ```
 
+## Notas
+
+- Asegúrate de que tu base de datos esté ejecutándose antes de iniciar la aplicación
+- Si encuentras problemas con la base de datos, puedes usar `npm run db:reset` para reiniciar las migraciones (esto eliminará todos los datos)
+
 ## Ejecutar el Proyecto
 
 ### Modo Desarrollo
@@ -48,7 +53,4 @@ La aplicación estará disponible en [http://localhost:3000](http://localhost:30
 
 - `npm run db:studio` - Abrir Prisma Studio para visualizar la base de datos
 
-## Notas
 
-- Asegúrate de que tu base de datos esté ejecutándose antes de iniciar la aplicación
-- Si encuentras problemas con la base de datos, puedes usar `npm run db:reset` para reiniciar las migraciones (esto eliminará todos los datos)
