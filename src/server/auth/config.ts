@@ -117,7 +117,6 @@ export const authConfig = {
   },
   events: {
     async signOut() {
-      // Custom signout logic if needed
     },
   },
   debug: process.env.NODE_ENV === "development",
